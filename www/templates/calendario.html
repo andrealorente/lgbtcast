@@ -1,0 +1,12 @@
+<ion-view title="Calendario">
+  <ion-content ng-init="cargarEventos()">
+    <h2>{{mes}}</h2>
+    <ion-list>
+      <ion-item class="item-thumbnail-left" ng-repeat="ev in eventos" ui-sref="tab.evento({id: ev.id})">
+        <img>
+        <h2>{{ev.title}}</h2>
+        <p style="white-space:normal;">{{ev.description}}</p>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

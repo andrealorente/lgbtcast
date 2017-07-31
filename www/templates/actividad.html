@@ -1,0 +1,11 @@
+<ion-view title="Actividad">
+  <ion-content>
+    <ion-list tagged-infinite-scroll="cargarActiv()" tagged-infinite-scroll-disabled="consultar || desactivar">
+      <ion-item class="item-avatar" ng-repeat="act in actividad">
+         <img src="https://s3.amazonaws.com/ionic-io-static/9zr7aST8QmKTZ60SJAYS_ed87f5e227d2c5adfc9cb0fd62349300.jpg">
+         <h2>{{act.origin_id}}</h2>
+         <p style="white-space:normal;">{{act.action}} {{act.target_id}}</p>
+       </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

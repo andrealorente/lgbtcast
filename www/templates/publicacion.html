@@ -1,0 +1,43 @@
+<ion-view title="Publicación" ng-init="cargarPost()">
+  <ion-content padding="true" class="has-header">
+    <ion-list>
+      <ion-item class="item-avatar" style="">
+        <img>
+        <h2 ui-sref="perfil({id: post.author_id})">{{post.author_data.username}}</h2>
+        <p am-time-ago="post.created_time"></p>
+      </ion-item>
+    </ion-list>
+    <div>
+      <img ng-if="post.image!=null" ng-src="http://res.cloudinary.com/tfg-lgbt-cloud/image/upload/v{{post.image}}.jpg" style="display: block; width: 100%; height: auto; margin-left: auto; margin-right: auto;">
+    </div>
+    <h1 style="color: rgb(0, 0, 0);">{{post.title}}</h1>
+    <div class="show-list-numbers-and-dots">
+      <p style="color:#000000;">
+        {{post.content}}
+        <strong>markdown</strong>
+      </p>
+    </div>
+    <strong>Etiquetas: </strong><p>#hola, #adios, #quetal</p>
+    <div class="button-bar">
+      <button style="color:#D93472;font-size:13px;" class="button button-stable button-block button-clear icon ion-heart"> 1 me gusta</button>
+      <button style="color:#D93472;font-size:13px;" class="button button-positive button-block button-clear icon ion-chatbubble"> 2 comentarios</button>
+    </div>
+    <ion-list>
+    <h3>Comentarios</h3>
+      <div class="item item-input-inset">
+        <label class="item-input-wrapper">
+          <input type="text" placeholder="Escribe un comentario" ng-model="comentario">
+        </label>
+        <button class="button button-small" ng-click="comentarPost()">
+          Enviar
+        </button>
+      </div>
+
+      <ion-item class="item-avatar" style="" ng-repeat="comment in post.comments">
+        <img>
+        <h2 ui-sref="perfil({id: comment.author_id})">{{comment.author_data.username}} <small style="font-size: 80%; color: #BDBCBC;" am-time-ago="comment.created_time"></small></h2>
+        <p style="white-space:normal;">{{comment.content}}</p>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

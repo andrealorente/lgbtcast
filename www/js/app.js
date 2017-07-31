@@ -4,9 +4,15 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers'])
+const BASE_URL = 'https://lgbt-api.herokuapp.com/v1';
+const MESES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
-.run(function($ionicPlatform) {
+angular.module('app', ['ionic','app.controllers','angularMoment','ion-floating-menu'])
+
+.run(function($ionicPlatform,amMoment) {
+  
+  amMoment.changeLocale('es');
+
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -22,52 +28,197 @@ angular.module('starter', ['ionic', 'starter.controllers'])
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
   $stateProvider
 
-    .state('app', {
-    url: '/app',
-    abstract: true,
-    templateUrl: 'templates/menu.html',
-    controller: 'AppCtrl'
-  })
-
-  .state('app.search', {
-    url: '/search',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/search.html'
-      }
-    }
-  })
-
-  .state('app.browse', {
-      url: '/browse',
+    .state('login', {
+      url: '/login',
       views: {
-        'menuContent': {
-          templateUrl: 'templates/browse.html'
+        'content': {
+          templateUrl: 'templates/login.html',
+          controller: 'loginCtrl'
         }
       }
+
     })
-    .state('app.playlists', {
-      url: '/playlists',
+
+    .state('registro',{
+      url: '/registro',
       views: {
-        'menuContent': {
-          templateUrl: 'templates/playlists.html',
-          controller: 'PlaylistsCtrl'
+        'content': {
+          templateUrl: 'templates/registro.html',
+          controller: 'regCtrl'
         }
       }
     })
 
-  .state('app.single', {
-    url: '/playlists/:playlistId',
+    // setup an abstract state for the tabs directive
+    .state('tab', {
+      url: '/tab',
+      abstract: true,
+      views: {
+        'content': {
+          templateUrl: 'templates/tabs.html'
+        }
+      }
+    })
+
+  .state('tab.inicio', {
+    url: '/inicio',
     views: {
-      'menuContent': {
-        templateUrl: 'templates/playlist.html',
-        controller: 'PlaylistCtrl'
+      'tab-inicio': {
+        templateUrl: 'templates/inicio.html',
+        controller: 'inicioCtrl'
       }
     }
-  });
+  })
+
+  .state('tab.calendario', {
+    url: '/calendario',
+    views: {
+      'tab-calendario': {
+        templateUrl: 'templates/calendario.html',
+        controller: 'calendarioCtrl'
+      }
+    }
+  })
+
+  .state('tab.canales', {
+    url: '/canales',
+    views: {
+      'tab-canales': {
+        templateUrl: 'templates/canales.html',
+        controller: 'canalesCtrl'
+      }
+    }
+  })
+
+  .state('tab.explorar', {
+    url: '/canales/explorar',
+    views: {
+      'tab-canales': {
+        templateUrl: 'templates/explorar.html',
+        controller: 'canalesCtrl'
+      }
+    }
+  })
+
+  .state('tab.actividad', {
+    url: '/actividad',
+    views: {
+      'tab-actividad': {
+        templateUrl: 'templates/actividad.html',
+        controller: 'activCtrl'
+      }
+    }
+  })
+
+  .state('tab.publicacion',{
+    url: '/inicio/:id',
+    views: {
+      'tab-inicio': {
+        templateUrl: 'templates/publicacion.html',
+        controller: 'inicioCtrl'
+      }
+    }
+  })
+
+  .state('tab.evento', {
+    url: '/calendario/:id',
+    views: {
+      'tab-calendario': {
+        templateUrl: 'templates/evento.html',
+        controller: 'calendarioCtrl'
+      }
+    }
+  })
+
+  .state('tab.canal', {
+    url: '/canales/:id',
+    views: {
+      'tab-canales': {
+        templateUrl: 'templates/canal.html',
+        controller: 'canalesCtrl'
+      }
+    }
+  })
+
+  .state('perfil', {
+    url: '/perfil/:id',
+    views: {
+      'content': {
+        templateUrl: 'templates/perfil.html',
+        controller: 'perfilCtrl'
+      }
+    }
+
+  })
+
+  .state('lista', {
+    url: '/perfil/:id/:caso',
+    views: {
+      'content': {
+        templateUrl: 'templates/lista.html',
+        controller: 'perfilCtrl'
+      }
+    }
+  })
+
+  .state('buscar', {
+    url: '/buscar',
+    views: {
+      'content': {
+        templateUrl: 'templates/buscar.html',
+        controller: 'perfilCtrl'
+      }
+    }
+  })
+
+  .state('editar',{
+    url:'/perfil/editar',
+    views: {
+      'content': {
+        templateUrl: 'templates/editarPerfil.html',
+        controller: 'perfilCtrl'
+      }
+    }
+  })
+
+    .state('configuracion', {
+      url: '/config',
+      views: {
+        'content': {
+          templateUrl: 'templates/configuracion.html',
+          controller: 'configCtrl'
+        }
+      }
+
+    });
+
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/playlists');
+  $urlRouterProvider.otherwise('/login');
+
+  // Intercepta las llamadas al backend añadiéndoles el token del usuario en el header del request
+  $httpProvider.interceptors.push(['$q', '$injector', function($q, $injector) {
+    return {
+      'request': function(config) {
+        config.headers = config.headers || {};
+        if (window.localStorage.getItem("user_token")) {
+          config.headers.Authorization = 'Bearer ' + window.localStorage.getItem("user_token");
+        }
+        return config;
+      },
+      'responseError': function(response) {
+
+        var $state = $injector.get("$state");
+        if (response.status === 401 || response.status === 403) {
+          $state.go("login");
+          window.localStorage.clear();
+        }
+        return $q.reject(response);
+      }
+    };
+}]);
+
+
 });

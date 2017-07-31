@@ -1,1 +1,88 @@
 /* Empty. Add your own CSS if you like */
+
+/* PRIMARY COLOR: #9c27b0; */
+/* ACCENT COLOR: ; #ff4081*/
+
+.sidemenu-perfil {
+  padding: 20px;
+  background: #51d0d5;
+}
+
+.sidemenu-perfil img{
+  height: 80px;
+  width: 80px;
+  border-radius: 100%;
+  border: 1px solid #fff;
+}
+
+.sidemenu-perfil h3 {
+  font-weight: bold;
+}
+
+#profile-info {
+  height: 220px;
+  padding: 20px;
+  background: #51d0d5;
+
+  color: #fff!important ;
+}
+
+#profile-image {
+  float:left;
+  width: 128px;
+  height: 128px;
+  border-radius: 100%;
+  border: 1px solid #fff;
+    margin-right: 10%;
+}
+
+#profile-info h3 {
+  font-weight: bold;
+}
+
+#profile-info button {
+  width: 100px;
+float: right;
+top: -5px;
+
+}
+
+/** CANAL **/
+.message-bubble {
+  background-color: white;
+  margin: 5px;
+  padding: 10px;
+  width: 250px;
+  border-radius: 10px;
+  position: relative;
+}
+
+.message-bubble:after { 
+  content: ''; 
+  position: absolute; 
+  left: 0; 
+  top: 50%; 
+  width: 0; 
+  height: 0; 
+  border: 10px solid transparent; 
+  border-right-color: white; 
+  border-left: 0; 
+  margin-top: -10px; 
+  margin-left: -10px; }
+
+.channel-info {
+  padding: 10px;
+  text-align: center;
+  background: white;
+
+}
+
+.channel-content {
+  background-color: #c9cdd1;
+  padding: 10px 0px 10px 10px;
+}
+
+.message-bubble small{
+  margin-left: 155px;
+  color: #6272e7;
+}

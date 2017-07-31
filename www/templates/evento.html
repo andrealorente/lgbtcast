@@ -1,0 +1,44 @@
+<ion-view title="Evento">
+  <ion-nav-buttons side="right" class="has-header">
+    <button class="button button-icon icon ion-android-more-vertical" ng-click="popover.show()"></button>
+  </ion-nav-buttons>
+  <ion-content padding="true" ng-init="cargarEvento()">
+    <div>
+      <img src="https://s3.amazonaws.com/ionic-io-static/9zr7aST8QmKTZ60SJAYS_ed87f5e227d2c5adfc9cb0fd62349300.jpg" style="display: block; width: 100%; height: auto; margin-left: auto; margin-right: auto;">
+    </div>
+    <h1 style="color: rgb(0, 0, 0);">{{evento.title}}</h1>
+    <div class="show-list-numbers-and-dots">
+      <p style="color:#000000;">
+        {{evento.description}}
+        <strong>markdown</strong>
+      </p>
+    </div>
+    <div class="button-bar">
+      <button style="color:#D93472;font-size:13px;" class="button button-stable button-block button-clear icon ion-heart"> 1 interesadxs</button>
+      <button style="color:#D93472;font-size:13px;" class="button button-positive button-block button-clear icon ion-checkmark"> 2 asistirán</button>
+    </div>
+    <ion-list>
+      <h3>Comentarios</h3>
+      <div class="item item-input-inset">
+        <label class="item-input-wrapper">
+          <input type="text" placeholder="Escribe un comentario">
+        </label>
+        <button class="button button-small">
+          Enviar
+        </button>
+      </div>
+      <ion-item class="item-avatar" ng-repeat="com in evento.comments">
+        <img>
+        <h2 ui-sref="perfil({id: com.author_id})">{{com.author_data.username}} 
+        <small style="font-size: 80%; color: #BDBCBC;"> {{comment.created_time}}</small></h2>
+        <p style="white-space:normal;">{{com.content}}</p>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+  <ion-footer-bar class="bar-positive">
+    <div class="button-bar">
+    <a class="button button-positive icon-left ion-heart">Me interesa</a>
+    <a class="button button-positive icon-left ion-checkmark">Asistir</a>
+  </div>
+  </ion-footer-bar>
+</ion-view>

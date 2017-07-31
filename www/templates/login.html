@@ -1,25 +1,21 @@
-<ion-modal-view>
-  <ion-header-bar>
-    <h1 class="title">Login</h1>
-    <div class="buttons">
-      <button class="button button-clear" ng-click="closeLogin()">Close</button>
-    </div>
-  </ion-header-bar>
-  <ion-content>
-    <form ng-submit="doLogin()">
-      <div class="list">
+
+  <ion-view title="Login" hide-nav-bar="true" style="background-color: rgb(209, 39, 246);">
+  <ion-content padding="true" style="background: url(https://s3.amazonaws.com/ionic-io-static/kIo5EmOWS42wUwWbwEwi_e870c4db344ae9e5ac5d8d2c5488d5b1.jpg) no-repeat center;background-size:cover;" class="manual-ios-statusbar-padding" scroll="false">
+    <form class="list">
+      <h3 style="color: rgb(40, 34, 36); font-weight: 400; text-align: center;">Únete a la comunidad LGBT con LGBTcast</h3>
+      <ion-list>
         <label class="item item-input">
-          <span class="input-label">Username</span>
-          <input type="text" ng-model="loginData.username">
+          <input placeholder="Nombre de usuario o email" type="text" ng-model="user.username">
         </label>
         <label class="item item-input">
-          <span class="input-label">Password</span>
-          <input type="password" ng-model="loginData.password">
+          <input placeholder="Contraseña" type="password" ng-model="user.password">
         </label>
-        <label class="item">
-          <button class="button button-block button-positive" type="submit">Log in</button>
-        </label>
-      </div>
+      </ion-list>
+      <div class="spacer" style="height: 40px;"></div>
+      <a ng-click="enviar(user)" class="button button-stable button-block">Entrar</a>
+      <a ng-click="loginFacebook()" class="button button-stable button-block">Entrar con Facebook</a>
+      <a ng-click="loginGoogle()" class="button button-stable button-block">Entrar con Google</a>
+      <a ui-sref="registro()" class="button button-positive button-block button-clear">O crea una cuenta</a>
     </form>
   </ion-content>
-</ion-modal-view>
+</ion-view>

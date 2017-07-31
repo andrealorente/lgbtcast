@@ -1,0 +1,18 @@
+<ion-view title="Canales">
+    <ion-content padding="false" class="has-header" ng-init="misCanales()">
+    <ion-list>
+      <ion-item class="item-avatar" ng-repeat="canal in miscanales" ui-sref="tab.canal({id: canal.id})">
+        <img src="https://s3.amazonaws.com/ionic-io-static/blfWoyQqS9UHGXQ2XwwB_e870c4db344ae9e5ac5d8d2c5488d5b1.jpg">
+        <h2>{{canal.title}}</h2>
+        <p>{{canal.description}}</p>
+      </ion-item>
+    </ion-list>
+    <!--ion-fab right bottom>
+      <button ion-fab><ion-icon name="add"></ion-icon></button>
+    </ion-fab-->
+
+  
+  </ion-content>
+  <ion-floating-button ui-sref="tab.explorar" has-footer="false" button-color="#2AC9AA" icon="ion-plus" icon-color="#fff">
+</ion-floating-button>
+</ion-view>

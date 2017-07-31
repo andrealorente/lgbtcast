@@ -1,0 +1,12 @@
+<ion-view title="Lista"> <!-- seguidores, seguidos, likes, etc. -->
+  <ion-content ng-init="cargarLista()">
+    <ion-list>
+      <ion-item class="item-avatar item-icon-right" ng-repeat="item in lista">
+        <img>
+        <h2>{{item.user_data.username}}</h2>
+        <p style="white-space:normal;">{{item.user_data.bio}}</p>
+        <i class="icon ion-android-person-add"></i>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

@@ -1,0 +1,30 @@
+<ion-view title="Editar perfil">
+  <ion-nav-buttons side="right" class="has-header">
+    <button class="button button-icon icon ion-android-send"> Guardar</button>
+  </ion-nav-buttons>
+  <ion-content padding="true" class=" manual-remove-top-padding has-header">
+    <div style="margin: 0px; line-height: 250px; background-color: rgb(232, 235, 239); text-align: center;">
+      <i class="icon ion-image" style="font-size: 64px; color: rgb(136, 136, 136); vertical-align: middle;"></i>
+    </div>
+    <a ng-click="cargarImagen()">Cargar imagen</a>
+    <img style="display:block;" id="picture" src="" width="150" height="150" />
+    <form class="list">
+      <label class="item item-input item-stacked-label">
+        <span class="input-label">Nombre de usuario</span>
+        <input placeholder="Nombre de usuario" type="text">
+      </label>
+      <label class="item item-input item-stacked-label">
+        <span class="input-label">Nombre</span>
+        <input placeholder="Nombre" type="text">
+      </label>
+      <label class="item item-input item-stacked-label">
+        <span class="input-label">Biografía</span>
+        <input placeholder="Biografía" type="text">
+      </label>
+      <label class="item item-input item-stacked-label">
+        <span class="input-label">Lugar</span>
+        <input placeholder="Alicante" type="text">
+      </label>
+    </form>
+  </ion-content>
+</ion-view>

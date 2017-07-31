@@ -1,0 +1,21 @@
+<ion-view title="Registro" hide-nav-bar="true" style="">
+  <ion-content padding="true" style="background: url(https://s3.amazonaws.com/ionic-io-static/rbb94lRTPyRDeqJYBjEZ_e870c4db344ae9e5ac5d8d2c5488d5b1.jpg) no-repeat center;background-size:cover;" class="manual-ios-statusbar-padding" scroll="false">
+    <form class="list">
+      <ion-list>
+        <label class="item item-input">
+          <input placeholder="Nombre de usuario" type="text" ng-model="user.username">
+        </label>
+        <label class="item item-input">
+          <input placeholder="Email" type="email" ng-model="user.email">
+        </label>
+        <label class="item item-input">
+          <input placeholder="Contraseña" type="password" ng-model="user.password">
+        </label>
+        <label class="item item-input">
+          <input placeholder="Repetir contraseña" type="password" ng-model="user.password2">
+        </label>
+      </ion-list>
+      <a ng-submit="enviar()" class="button button-stable button-block">Registrarse</a>
+    </form>
+  </ion-content>
+</ion-view>

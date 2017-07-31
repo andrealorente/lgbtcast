@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "143727678995",
+    "project_id": "lgbtcast-tfg"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:143727678995:android:764d2cb7da3280eb",
+        "android_client_info": {
+          "package_name": "io.ionic.starter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "143727678995-oq0cj7ucheb35tbpcfuv5b8ih9dkvb7i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.ionic.starter",
+            "certificate_hash": "115e633f714e6b8ab438c03b2aa59728cf600dd2"
+          }
+        },
+        {
+          "client_id": "143727678995-0as6ra40tlkfih6jpk7eoj2avp5vd481.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBz_JoPPmAmOMLrrdCxr_t5yoZIYMlpQCo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
