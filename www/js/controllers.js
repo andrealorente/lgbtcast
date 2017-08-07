@@ -9,6 +9,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   //$scope.$on('$ionicView.enter', function(e) {
   //});
   $scope.$on('$ionicView.enter', function(e) {
+    console.log("Entro en el evento $ionicView.enter del AppCtrl");
     $scope.myData = {
       id: localStorage.getItem("user_id"),
       username: localStorage.getItem("user_username"),
@@ -83,6 +84,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
             //LocalStorage de Cordova
             localStorage.setItem("user_id", data.data.id);
             localStorage.setItem("user_username", data.data.username);
+            localStorage.setItem("user_name", data.data.name);
             localStorage.setItem("user_token", data.token);
             localStorage.setItem("user_public", data.data.public);
 
@@ -208,7 +210,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   $scope.posts = [];
   $scope.consultar = false;
   $scope.desactivar = false; //Deshabilitar llamadas a la api si no hay más datos
-  $scope.comentario = "";
+  $scope.com = {};
 
   $scope.cargarPosts = function() {
 
@@ -227,6 +229,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
           }
       }, function(error){
           //there was an error fetching from the server
+          console.log(error);
       });
 
     }
@@ -240,6 +243,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
       $scope.$broadcast('scroll.refreshComplete');
       }, function(error){
           //there was an error fetching from the server
+          console.log(error);
       });
   };
 
@@ -267,13 +271,13 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   };
 
   $scope.comentarPost = function() {
-    
-    $json_post = {target_id: $stateParams.id, content: $scope.comentario};
+
+    $json_post = {target_id: $stateParams.id, content: $scope.com.texto};
     var url = '/posts/' + $stateParams.id + '/comments';
 
     $http.post(BASE_URL + url, $json_post).then(function(response){
       if(response.data.success){
-        $scope.comentario = "";
+        $scope.com.texto = "";
         $scope.cargarPost();
       }
     },function(error){
@@ -288,7 +292,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   $scope.anyo = 0; //El año: 2017
   $scope.eventos = [];
   $scope.sineventos = false;
-  $scope.comentario = "";
+  $scope.com = {};
 
   $scope.cargarEventos = function() {
     var hoy = new Date();
@@ -309,10 +313,50 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     });
   };
 
+  $scope.cambiarMes = function(next) {
+    var m = MESES.indexOf($scope.mes); //Si es febrero m = 1, hay que aumentar este valor
+    if(next){
+      if(m == 11){
+        //Siguiente mes
+        //Si es diciembre pasa a ser enero del año siguiente
+        m = 0;
+        $scope.anyo += 1;
+      }else{
+        m++;
+      }
+
+    }else{
+      //Mes anterior
+      if(m == 0){
+        //Si es enero pasa a ser diciembre del año anterior
+        m = 11;
+        $scope.anyo -= 1;
+      }else m--;
+    }
+
+
+    var url = '/events?month='+ m + '&year=' + $scope.anyo;
+    $http.get(BASE_URL + url).then(function(response){
+      if (response.data.success == true) {
+        console.log("Events cargados");
+        console.log(response.data);
+        if(response.data.data.length == 0)
+          $scope.sineventos = true;
+        else $scope.sineventos = false;
+
+        $scope.mes = MESES[m];
+        $scope.eventos = response.data.data;
+      }
+    },function(error){
+        console.log("Error: "+error);
+    });
+  };
+
   $scope.cargarEvento = function(){
     $scope.evento = {};
     $http.get(BASE_URL+'/events/'+$stateParams.id).then(function(response){
       if(response.data.success){
+        console.log(response.data);
         $scope.evento = response.data.data;
       }
     },function(error){
@@ -322,12 +366,14 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
 
   $scope.comentar = function() {
 
-    $json_post = {target_id: $stateParams.id, content: $scope.comentario};
+    $json_post = {target_id: $stateParams.id, content: $scope.com.texto};
     var url = '/events/' + $stateParams.id + '/comments';
 
     $http.post(BASE_URL + url, $json_post).then(function(response){
-      $scope.comentario = "";
-      $scope.cargarEvento();
+      if(response.data.success) {
+        $scope.com.text="";
+        $scope.cargarEvento();
+      }
     },function(error){
       console.log(error);
     });
@@ -345,9 +391,28 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     $http.post(BASE_URL + url, $json_post).then(function(response){
       if(response.data.success)
         console.log("Correcto.");
+        cargarEvento();
     },function(error){
       console.log(error);
     });
+  };
+
+  $scope.cargarLista = function() {
+    $scope.lista = [];
+    if($stateParams.caso == "interesados")
+      var url = '/events/'+ $stateParams.id +'/interested';
+    else if($stateParams.caso == "asistentes")
+      var url = '/events/'+ $stateParams.id +'/assist';
+    
+    $http.get(BASE_URL+url).then(function(response){
+      if(response.data.success){
+        $scope.lista = response.data.data;
+        console.log($scope.lista);
+      }
+    },function(error){
+      console.log(error);
+    });
+
   };
 })
 
@@ -438,6 +503,9 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
 
   //Cargar datos en el perfil de un usuario
   $scope.cargarUsuario = function() {
+    $ionicLoading.show({
+         template: '<ion-spinner icon="spiral"></ion-spinner>'
+    });
     $scope.mostrarAct = false;
 
     $http.get(BASE_URL+'/users/'+$stateParams.id).then(function(response){
@@ -456,11 +524,15 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
             if(response2.data.data.outgoing == "follows") $scope.botonMsg = "Siguiendo";
             else if(response2.data.outgoing == "requested") $scope.botonMsg = "Solicitado";
             else if(response2.data.outgoing == "none" && $scope.usuario.public==false) $scope.botonMsg = "Solicitar seguir";
+
+            $ionicLoading.hide();
           }
         },function(error2){
           console.log("Eerrorrr");
         });
       }
+      $scope.mostrarAct = true;
+      $ionicLoading.hide();
     }, function(error){
       console.log(error);
     });
@@ -481,30 +553,30 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     $http.get(BASE_URL+url).then(function(response){
       console.log(response);
       if($stateParams.caso != "peticiones" && response.data.data.length>0 && !$scope.soyYo($stateParams.id)){ //Si son seguidores/seguidos de otro usuario
-          for(var i=0; i<response.data.data.length; i++){
-              //Obtener la relación entre ese usuario y yo
-              var url = BASE_URL + '/users/' + response.data.data[i].id + '/relationship';
+        for(var i=0; i<response.data.data.length; i++){
+          //Obtener la relación entre ese usuario y yo
+          var url = BASE_URL + '/users/' + response.data.data[i].id + '/relationship';
+        
+          $http({
+            method: "GET",
+            url: url
+          }).then(function success(data2){
             
-              $http({
-                method: "GET",
-                url: url
-              }).then(function success(data2){
-                
-                if(j<i){
-                  if(data2.data.data.outgoing == "follows") botonMsg = "Siguiendo";
-                  else if(data2.data.data.outgoing == "requested") botonMsg = "Solicitado";
-                  else if(data2.data.data.outgoing == "none" && data.data[j].public==false) botonMsg = "Solicitar seguir";
+            if(j<i){
+              if(data2.data.data.outgoing == "follows") botonMsg = "Siguiendo";
+              else if(data2.data.data.outgoing == "requested") botonMsg = "Solicitado";
+              else if(data2.data.data.outgoing == "none" && response.data.data[j].public==false) botonMsg = "Solicitar seguir";
 
-                  $scope.list.push({
-                    user: response.data.data[j],
-                    relwithme: botonMsg
-                  });
-                  j++;
-                }
-
+              $scope.lista.push({
+                user: response.data.data[j],
+                relwithme: botonMsg
               });
+              j++;
+            }
 
-        }//Fin for
+          });
+
+      }//Fin for
 
       }else if($stateParams.caso!="peticiones" && response.data.data.length>0 && $scope.soyYo($stateParams.id)){
         for(var i in response.data.data){
@@ -517,10 +589,12 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
             user: response.data.data[i],
             relwithme: botonMsg
           });
-        }
+        }//Fin for
+        console.log("Lista: ");
+        console.log($scope.lista);
       }
     },function(error){
-      console.log("errroror");
+      console.log("Error cargando la lista de usuarios.");
     });
   };
 
@@ -635,18 +709,18 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
 
     if(!$scope.consultar){
       $scope.consultar = true;
-    $http.get(url).then(function(response){
-      console.log(response);
-      $scope.consultar = false;
-      if(response.data.success){
-        if(response.data.data.length>0)
-          $scope.actividad = $scope.actividad.concat(response.data.data);
-        else {
-          $scope.desactivar = true;
-        }
+      $http.get(url).then(function(response){
+        console.log(response);
+        $scope.consultar = false;
+        if(response.data.success){
+          if(response.data.data.length>0)
+            $scope.actividad = $scope.actividad.concat(response.data.data);
+          else {
+            $scope.desactivar = true;
+          }
       }
     },function(error){
-
+      console.log(error);
     });
 
   }
@@ -664,7 +738,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     $http.post(BASE_URL+'/users/edit').then(function(response){
 
     }, function(error){
-
+      console.log(error);
     });
   };
 

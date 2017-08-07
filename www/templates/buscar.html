@@ -1,5 +1,21 @@
 <ion-view view-title="Buscar">
+<ion-tabs class="tabs-icon-top tabs-positive">
+
+    <ion-tab title="Contenido" icon="ion-home" href="#/tab/inicio">
+      <ion-nav-view name="tab-inicio"></ion-nav-view>
+    </ion-tab>
+
+    <ion-tab title="Personas" icon="ion-ios-information" href="#/tab/calendario">
+      <ion-nav-view name="tab-calendario"></ion-nav-view>
+    </ion-tab>
+
+  </ion-tabs>
   <ion-content>
+
     <h1>Search</h1>
+    <input placeholder="Nombre de usuario o email" type="text">
+    <button class="button button-positive">Buscar</button>
+
+
   </ion-content>
 </ion-view>

@@ -1,4 +1,4 @@
-<ion-view title="Canales">
+<ion-view cache-view="false" title="Canales">
     <ion-content padding="false" class="has-header" ng-init="misCanales()">
     <ion-list>
       <ion-item class="item-avatar" ng-repeat="canal in miscanales" ui-sref="tab.canal({id: canal.id})">
@@ -7,10 +7,6 @@
         <p>{{canal.description}}</p>
       </ion-item>
     </ion-list>
-    <!--ion-fab right bottom>
-      <button ion-fab><ion-icon name="add"></ion-icon></button>
-    </ion-fab-->
-
   
   </ion-content>
   <ion-floating-button ui-sref="tab.explorar" has-footer="false" button-color="#2AC9AA" icon="ion-plus" icon-color="#fff">

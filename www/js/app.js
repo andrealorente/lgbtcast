@@ -7,7 +7,7 @@
 const BASE_URL = 'https://lgbt-api.herokuapp.com/v1';
 const MESES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
-angular.module('app', ['ionic','app.controllers','angularMoment','ion-floating-menu'])
+angular.module('app', ['ionic', 'app.controllers','angularMoment','ion-floating-menu'])
 
 .run(function($ionicPlatform,amMoment) {
   
@@ -128,6 +128,16 @@ angular.module('app', ['ionic','app.controllers','angularMoment','ion-floating-m
     views: {
       'tab-calendario': {
         templateUrl: 'templates/evento.html',
+        controller: 'calendarioCtrl'
+      }
+    }
+  })
+
+  .state('tab.listas', {
+    url: '/calendario/:id/:caso',
+    views: {
+      'tab-calendario': {
+        templateUrl: 'templates/lista.html',
         controller: 'calendarioCtrl'
       }
     }

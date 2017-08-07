@@ -25,6 +25,7 @@
 
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
+
     <script src="lib/angular/angular-md5.js"></script>
     <script src="lib/angular/taggedInfiniteScroll.js"></script>
     <script src="lib/moment/moment.js"></script>
@@ -42,7 +43,7 @@
   </head>
 
   <body ng-app="app">
-    <ion-side-menus enable-menu-with-back-views="false">
+    <ion-side-menus enable-menu-with-back-views="false" ng-controller="AppCtrl">
       <ion-side-menu-content>
 
         <ion-nav-bar class="bar-positive">
@@ -63,7 +64,7 @@
 
       </ion-side-menu-content>
 
-      <ion-side-menu side="left" ng-controller="AppCtrl">
+      <ion-side-menu side="left">
 
         <ion-content>
           <div class="sidemenu-perfil">
@@ -73,7 +74,7 @@
           </div>
           <ion-list>
             <ion-item class="item-icon-left" menu-close ui-sref="perfil({id: myData.id})"><i class="icon ion-android-person"></i>Mi perfil</ion-item>
-            <ion-item class="item-icon-left" menu-close ui-sref="lista({id: myData.id, caso: 'peticiones'})"><i class="icon ion-android-person-add"></i>Solicitudes de seguimiento</ion-item>
+            <ion-item class="item-icon-left" menu-close ng-show="myData.public=='false'" ui-sref="lista({id: myData.id, caso: 'peticiones'})"><i class="icon ion-android-person-add"></i>Solicitudes de seguimiento</ion-item>
             <ion-item class="item-icon-left" menu-close href="#/config"><i class="icon ion-android-settings"></i>Configuración</ion-item>
             <ion-item class="item-icon-left" menu-close href="#/editor"><i class="icon ion-email"></i>Hacerme editor</ion-item>
           </ion-list>
