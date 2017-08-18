@@ -6,17 +6,26 @@
     <div>
       <img src="https://s3.amazonaws.com/ionic-io-static/9zr7aST8QmKTZ60SJAYS_ed87f5e227d2c5adfc9cb0fd62349300.jpg" style="display: block; width: 100%; height: auto; margin-left: auto; margin-right: auto;">
     </div>
+    <div class="list">
+       <ion-item class="item-icon-left"><i class="icon ion-location"></i>{{evento.place}}</ion-item>
+       <ion-item class="item-icon-left">
+        <i class="icon ion-calendar"></i>
+        <span>{{evento.start_time | amDateFormat:'D MMMM YYYY, HH:mm'}}</span>
+        <span> - {{evento.end_time | amDateFormat:'D MMMM YYYY, HH:mm'}}</span>
+        </ion-item>
+    </div>
     <h1 style="color: rgb(0, 0, 0);">{{evento.title}}</h1>
+
     <div class="show-list-numbers-and-dots">
       <p style="color:#000000;">
         {{evento.description}}
-        <strong>markdown</strong>
       </p>
+      <p>Organizado por <a ui-sref="perfil({id: evento.author_id})">{{evento.author_data.username}}</a></p>
     </div>
     <div class="button-bar">
-      <button style="color:#D93472;font-size:13px;" class="button button-stable button-block button-clear icon ion-heart"> 
+      <button style="color:#D93472;font-size:13px;" class="button button-stable button-block button-clear icon ion-heart" ui-sref="tab.listas({id: evento.id, caso: 'interesados'})"> 
       {{evento.interested.length}} interesadxs</button>
-      <button style="color:#D93472;font-size:13px;" class="button button-positive button-block button-clear icon ion-checkmark"> 
+      <button style="color:#D93472;font-size:13px;" class="button button-positive button-block button-clear icon ion-checkmark" ui-sref="tab.listas({id: evento.id, caso: 'asistentes'})"> 
       {{evento.assistants.length}} asistirán</button>
     </div>
     <ion-list>

@@ -1,4 +1,4 @@
-<ion-view title="Perfil">
+<ion-view title="Perfil" cache-view="false">
   <ion-content has-header="true" ng-init="cargarUsuario()">
     <div id="profile-bg"></div>
     <ion-slides disable-side-menu-drag="" options="{'loop': false}" slider="slider" delegate-handle="slider" id="profile-info">
@@ -19,9 +19,10 @@
       <button class="button button-positive button-block button-outline" ui-sref="lista({id: usuario.id, caso: 'seguidores'})">{{usuario.counts.followedby}} seguidor</button>
       <button class="button button-positive button-block button-outline" ui-sref="lista({id: usuario.id, caso: 'siguiendo'})">{{usuario.counts.following}} siguiendo</button>
     </div>
+
     <!--Actividad -->
     <ion-list ng-if="mostrarAct">
-      <ion-item class="item-avatar" ng-repeat="act in usuario.activity">
+      <ion-item class="item-avatar" ng-repeat="act in usuario.activity | orderBy: '-created_time'">
        <img src="https://s3.amazonaws.com/ionic-io-static/9zr7aST8QmKTZ60SJAYS_ed87f5e227d2c5adfc9cb0fd62349300.jpg">
        <h2>
         {{usuario.username}}
@@ -31,6 +32,8 @@
         {{act.action}}
         <a ng-if="act.type==1" ui-sref="tab.publicacion({id: act.target_id})">publicación</a>
         <a ng-if="act.type==2" ui-sref="tab.evento({id: act.target_id})">evento</a>
+        <a ng-if="act.type==3" ui-sref="perfil({id: act.target_id})">usuario</a>
+        <a ng-if="act.type==4" ui-sref="tab.canal({id: act.target_id})">canal</a>
       </p>
     </ion-item>
 

@@ -17,10 +17,10 @@
         <strong>markdown</strong>
       </p>
     </div>
-    <strong>Etiquetas: </strong><p>#hola, #adios, #quetal</p>
+    <strong>Etiquetas: </strong><p><span ng-repeat="tag in post.tags">#{{tag}} </span></p>
     <div class="button-bar">
-      <button style="color:#D93472;font-size:13px;" class="button button-stable button-block button-clear icon ion-heart"> 1 me gusta</button>
-      <button style="color:#D93472;font-size:13px;" class="button button-positive button-block button-clear icon ion-chatbubble"> 2 comentarios</button>
+      <button style="color:#D93472;font-size:13px;" class="button button-stable button-block button-clear icon ion-heart" ui-sref="tab.likes({id: post.id})"> {{post.likes.length}} me gusta</button>
+      <button style="color:#D93472;font-size:13px;" class="button button-positive button-block button-clear icon ion-chatbubble"> {{post.comments.length}} comentarios</button>
     </div>
     <ion-list>
     <h3>Comentarios</h3>
@@ -33,7 +33,7 @@
         </button>
       </div>
 
-      <ion-item class="item-avatar" style="" ng-repeat="comment in post.comments">
+      <ion-item class="item-avatar" style="" ng-repeat="comment in post.comments | orderBy: 'created_time'">
         <img>
         <h2 ui-sref="perfil({id: comment.author_id})">{{comment.author_data.username}} <small style="font-size: 80%; color: #BDBCBC;" am-time-ago="comment.created_time"></small></h2>
         <p style="white-space:normal;">{{comment.content}}</p>

@@ -17,6 +17,9 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
       public: localStorage.getItem("user_public")
     };
   });
+  $scope.$on('$ionicView.beforeEnter', function (event, viewData) {
+    viewData.enableBack = true;
+  });
   // Form data for the login modal
   $scope.loginData = {};
 
@@ -48,6 +51,17 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     }, 1000);
   };
 
+  //Esto no sé si iría aquí
+  /*FCMPlugin.onNotification(function(data){
+    if(data.wasTapped){
+      //Notification was received on device tray and tapped by the user.
+      alert(JSON.stringify(data));
+    }else{
+      //Notification was received in foreground. Maybe the user needs to be notified.
+      alert(JSON.stringify(data));
+    }
+  });*/
+
 })
 
 .controller('loginCtrl', function($scope, $state, md5,$http,$ionicSideMenuDelegate){
@@ -60,8 +74,8 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   $scope.user = {};
   $scope.enviar = function(){
     if ($scope.user.username == null || $scope.user.password == null) {
-      $scope.showerror = true;
-      $scope.errormsg = "Tienes que rellenar los campos.";
+      window.plugins.toast.showLongBottom('Tienes que rellenar los campos', function(a){
+      console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
     } else {
       $scope.showerror = false;
       var pswd = md5.createHash($scope.user.password || '');
@@ -88,19 +102,27 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
             localStorage.setItem("user_token", data.token);
             localStorage.setItem("user_public", data.data.public);
 
-            /*$localStorage.user_id = data.data.id;
-            $localStorage.user_username = data.data.username;
-            $localStorage.user_bio = data.data.bio;
-            $localStorage.token = data.token;
-
-            $json_post2 = { firebase_token: firebase_token }*/
+            FCMPlugin.getToken(function(token) {
+              // save this server-side and use it to push notifications to this device
+              alert(token);
+              $json_post2 = { firebase_token: token };
+              console.log(token);
+              $http.post(BASE_URL+ '/firebase',$json_post2).then(function(response){
+                console.log(response.data);
+                if(response.data.success)
+                  localStorage.setItem("user_firebase", response.data.data);
+              },function(error){
+                //Mostrar un Toast o algo
+                console.log(error);
+              });
+            });
             //Guardar el firebase_token en la bd
             $state.go('tab.inicio');
 
           } else {
             //Mostrar mensaje de error
-            $scope.showerror = true;
-            $scope.errormsg = "No coincide el nombre de usuario y la contraseña.";
+            window.plugins.toast.showLongBottom(data.error.message, function(a){
+            console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
           }
         })
         .error(function(data) {
@@ -115,25 +137,30 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
       console.log("Token: " + token);
     });
     facebookConnectPlugin.api("/me?fields=id,name,email,picture", ["public_profile", "email"], function(response) {
-          console.log(response.id + " | " + response.name + " | " + response.email + " | ");
-          $json_post = {
-            email: response.email,
-            name: response.name,
-          };
-          //Buscar el email en la bd
-          $http.post(BASE_URL+'/users/login/facebook', $json_post).then(function(res){
+      console.log(response.id + " | " + response.name + " | " + response.email + " | ");
+      $json_post = {
+        email: response.email,
+        name: response.name,
+      };
+      //Buscar el email en la bd
+      $http.post(BASE_URL+'/users/login/facebook', $json_post).then(function(res){
 
-              //LocalStorage de Cordova
-              localStorage.setItem("user_id", res.data.data.id);
-              localStorage.setItem("user_username", res.data.data.username);
-              localStorage.setItem("user_token", res.data.token);
-              localStorage.setItem("user_public", res.data.data.public);
-
-              $state.go('tab.inicio');
-          }, function(error){
-            console.log(error);
-          });
-      },function(err){console.log(err);});
+        if(res.data.success){
+          //LocalStorage de Cordova
+          localStorage.setItem("user_id", res.data.data.id);
+          localStorage.setItem("user_username", res.data.data.username);
+          localStorage.setItem("user_token", res.data.token);
+          localStorage.setItem("user_public", res.data.data.public);
+          
+          $state.go('tab.inicio');
+        }else{
+          window.plugins.toast.showLongBottom(res.data.error.message, function(a){
+            console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        }
+      }, function(error){
+        console.log(error);
+      });
+    },function(err){console.log(err);});
   };
 
   $scope.loginFacebook = function(){
@@ -154,6 +181,17 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
       },
       function (obj) {
         alert(JSON.stringify(obj)); // do something useful instead of alerting
+        console.log(obj);
+        $json_post = {
+          email: obj.email, //Mirar cómo se llaman los valores estos imprimiendo el obj
+          name: obj.name 
+        };
+
+        $http.post(BASE_URL+'/users/login/google').then(function(response){
+
+        }, function(error){
+
+        });
       },
       function (msg) {
         alert('error: ' + msg);
@@ -169,7 +207,8 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   $scope.user = {};
   $scope.enviar = function() {
     if ($scope.user.username == null || $scope.user.password == null || $scope.user.password2 == null || $scope.user.email == null) {
-      $scope.errormsg = "Es necesario rellenar todos los campos.";
+      window.plugins.toast.showLongBottom('Es necesario rellenar todos los campos', function(a){
+        console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
     } else {
       //Comprobar que coinciden las dos contraseñas
       if ($scope.user.password == $scope.user.password2) {
@@ -198,7 +237,8 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
         });
 
       } else {
-        $scope.errormsg = "Las contraseñas no coinciden.";
+        window.plugins.toast.showLongBottom('Las contraseñas no coinciden', function(a){
+        console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
       }
     }
   };
@@ -252,6 +292,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   $scope.cargarPost = function() {
     $http.get(BASE_URL+'/posts/'+$stateParams.id).then(function(response){
       $scope.post = response.data.data;
+      $scope.post.id = $stateParams.id;
       console.log(response);
     }, function(error){
         console.log("Error: "+error);
@@ -279,6 +320,23 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
       if(response.data.success){
         $scope.com.texto = "";
         $scope.cargarPost();
+      }
+    },function(error){
+      console.log(error);
+    });
+  };
+
+  $scope.cargarLista = function() { //De la gente que le ha dado like al post
+    $scope.lista = [];
+
+    var url = '/posts/' + $stateParams.id + '/likes?after='
+    $http.get(BASE_URL+url).then(function(response){
+      console.log(response.data);
+      for(var i in response.data.data){
+        $scope.lista.push({
+          user: response.data.data[i],
+          relwithme: 'hola'
+        });
       }
     },function(error){
       console.log(error);
@@ -358,6 +416,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
       if(response.data.success){
         console.log(response.data);
         $scope.evento = response.data.data;
+        $scope.evento.id = $stateParams.id;
       }
     },function(error){
 
@@ -391,7 +450,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     $http.post(BASE_URL + url, $json_post).then(function(response){
       if(response.data.success)
         console.log("Correcto.");
-        cargarEvento();
+        $scope.cargarEvento();
     },function(error){
       console.log(error);
     });
@@ -406,7 +465,14 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     
     $http.get(BASE_URL+url).then(function(response){
       if(response.data.success){
-        $scope.lista = response.data.data;
+        console.log(response.data);
+        for(var i in response.data.data){
+          $scope.lista.push({
+            user: response.data.data[i],
+            relwithme: 'hola'
+          });
+        }
+        
         console.log($scope.lista);
       }
     },function(error){
@@ -416,7 +482,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   };
 })
 
-.controller('canalesCtrl', function($scope, $http, $stateParams) {
+.controller('canalesCtrl', function($scope, $http, $stateParams, $ionicPopover) {
   $scope.miscanales = [];
   $scope.canales = [];
   $scope.suscBtn = "Suscribirme";
@@ -444,10 +510,12 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
 
   $scope.cargarCanal = function() {
     $scope.canal = {};
+
     $http.get(BASE_URL+'/channels/'+$stateParams.id).then(function(response){
       if(response.data.success){
         console.log(response.data.data);
         $scope.canal = response.data.data;
+        $scope.canal.id = $stateParams.id;
         //Si estoy suscrita cambiar el mensaje del botón
         if($scope.canal.susc.indexOf(localStorage.user_id)==-1)
           $scope.suscBtn = "Suscribirme";
@@ -466,10 +534,25 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     $http.post(BASE_URL + url).then(function(response){
       if(response.data.success){
         //Cambiar el mensaje del botón
-        if($scope.suscBtn=="Suscribirme")
+        if($scope.suscBtn=="Suscribirme"){
           $scope.suscBtn = "Eliminar suscripción";
-        else
+          //Suscribirme al topic del canal
+          FCMPlugin.subscribeToTopic($stateParams.id, function(msg){
+            console.log(msg);
+            alert(msg);
+          }, function(err){
+            alert("Error");
+            console.log("Error suscribiéndome al topic de firebase");
+          });
+        }else{
           $scope.suscBtn = "Suscribirme";
+          FCMPlugin.unsubscribeFromTopic($stateParams.id, function(msg){
+            console.log(msg);
+            alert(msg);
+          }, function(err){
+            console.log("Error suscribiéndome al topic de firebase");
+          });
+        }
       }
     },function(error){
       console.log(error);
@@ -489,16 +572,49 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
       console.log(error);
     });
   };
+
+  $scope.cargarLista = function() { //De suscriptores
+    $scope.lista = [];
+    $http.get(BASE_URL+'/channels/'+ $stateParams.id + '/suscribers').then(function(response){
+      for(var i in response.data.data){
+        $scope.lista.push({
+          user: response.data.data[i],
+          relwithme: 'hola'
+        });
+      }
+      console.log($scope.lista);
+    }, function(error){
+      console.log(error);
+    });
+  };
+
+  $ionicPopover.fromTemplateUrl('templates/popover.html', {
+    scope: $scope,
+  }).then(function(popover) {
+    $scope.popover = popover;
+  });
+
 })
 
 .controller('perfilCtrl', function($scope, $stateParams,$http,$state,$ionicLoading) {
   $scope.usuario = {};
+  $scope.datos = {};
 
   //Función para mostrar (o no) funcionalidades
   $scope.soyYo = function(id){
     if(id != localStorage.user_id){
       return false;
     }else return true;
+  };
+
+  $scope.cargarMisDatos = function() {
+    
+    $http.get(BASE_URL+'/users/'+ localStorage.getItem("user_id")).then(function(response){
+      $scope.datos = response.data.data;
+      console.log($scope.datos);
+    }, function(error){
+      console.log(error);
+    });
   };
 
   //Cargar datos en el perfil de un usuario
@@ -567,8 +683,15 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
               else if(data2.data.data.outgoing == "requested") botonMsg = "Solicitado";
               else if(data2.data.data.outgoing == "none" && response.data.data[j].public==false) botonMsg = "Solicitar seguir";
 
+              var user = {
+                id: response.data.data[j].id,
+                username: response.data.data[j].user_data.username,
+                name: response.data.data[j].user_data.name,
+                image: response.data.data[j].user_data.image,
+                public: response.data.data[j].user_data.public,
+              };
               $scope.lista.push({
-                user: response.data.data[j],
+                user: user,
                 relwithme: botonMsg
               });
               j++;
@@ -585,8 +708,15 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
           else if(response.data.data[i].outgoing_status == "requested") botonMsg = "Solicitado";
           else if(response.data.data[i].outgoing_status == "none" && response.data.data[i].user_data.public==false) botonMsg = "Solicitar seguir";
 
+          var user = {
+            id: response.data.data[i].id,
+            username: response.data.data[i].user_data.username,
+            name: response.data.data[i].user_data.name,
+            image: response.data.data[i].user_data.image,
+            public: response.data.data[i].user_data.public,
+          };
           $scope.lista.push({
-            user: response.data.data[i],
+            user: user,
             relwithme: botonMsg
           });
         }//Fin for
@@ -639,13 +769,21 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   $scope.editarUsuario = function() {
 
     $json_post = {
-
+      user_username: datos.username,
+      user_name: datos.name,
+      user_bio: datos.bio,
+      user_email: datos.email,
+      user_gender: datos.gender,
+      user_place: datos.place,
+      user_image: datos.image
     };
 
-    $http.post(BASE_URL+'/users/'+ localStorage.user_id).then(function(response){
-
-    },function(error){
-
+    $http.post(BASE_URL+'/users/'+ localStorage.getItem("user_id"), $json_post).then(function(response){
+      console.log(response.data);
+      if(!response.data.success)
+        alert(response.data.error.message);
+    },function(error){  
+      console.log(error);
     });
   };
 
@@ -684,7 +822,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   };
 
   $scope.onFail = function(message) {
-        alert('Failed because: ' + message);
+    alert('Failed because: ' + message);
   };
 
   $scope.cargarImagen = function() {
@@ -728,15 +866,31 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
 
 })
 
-.controller('configCtrl', function($scope, $stateParams,$state) {
+.controller('reportCtrl', function($scope, $http, $ionicHistory){
+  $scope.enviar = function() {
+    $json_post = {};
+    $http.post(BASE_URL+'/report', $json_post).then(function(response){
+
+    }, function(error){
+      console.log(error);
+    });
+  };
+
+  $scope.irAtras = function() {
+    $ionicHistory.goBack();
+  };
+})
+
+.controller('configCtrl', function($scope, $stateParams,$state,$ionicHistory) {
 
   $scope.fontSize = function() {
 
   };
 
   $scope.perfilPrivado = function(){
-    $http.post(BASE_URL+'/users/edit').then(function(response){
-
+    $json_post = {};
+    $http.post(BASE_URL+'/users/edit', $json_post).then(function(response){
+      console.log(respone.data);
     }, function(error){
       console.log(error);
     });
@@ -744,6 +898,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
 
   $scope.cerrarSesion = function() {
     localStorage.clear();
+    $ionicHistory.clearCache();
     $state.go('login');
   };
 });

@@ -4,10 +4,10 @@
       <ion-item class="item item-avatar item-button-right" ng-repeat="item in lista">
         <img>
         <h2 ui-sref="perfil({id: item.user.id})">
-          {{item.user.user_data.username}}
-          <i class="icon ion-locked" ng-hide="item.user.user_data.public"></i>
+          {{item.user.username}}
+          <i class="icon ion-locked" ng-hide="item.user.public"></i>
         </h2>
-        <p style="white-space:normal;">{{item.user_data.bio}}</p>
+        <p style="white-space:normal;">{{item.user.name}}</p>
         <!--i class="icon ion-android-person-add"></i-->
         <!--button class="button button-stable button-block">Seguir</button-->
       </ion-item>

@@ -123,6 +123,16 @@ angular.module('app', ['ionic', 'app.controllers','angularMoment','ion-floating-
     }
   })
 
+  .state('tab.likes',{
+    url: '/inicio/:id/likes',
+    views: {
+      'tab-inicio': {
+        templateUrl: 'templates/lista.html',
+        controller: 'inicioCtrl'
+      }
+    }
+  })
+
   .state('tab.evento', {
     url: '/calendario/:id',
     views: {
@@ -148,6 +158,16 @@ angular.module('app', ['ionic', 'app.controllers','angularMoment','ion-floating-
     views: {
       'tab-canales': {
         templateUrl: 'templates/canal.html',
+        controller: 'canalesCtrl'
+      }
+    }
+  })
+
+  .state('tab.susc', {
+    url: '/canales/:id/suscriptores',
+    views: {
+      'tab-canales': {
+        templateUrl: 'templates/lista.html',
         controller: 'canalesCtrl'
       }
     }
@@ -194,16 +214,36 @@ angular.module('app', ['ionic', 'app.controllers','angularMoment','ion-floating-
     }
   })
 
-    .state('configuracion', {
-      url: '/config',
-      views: {
-        'content': {
-          templateUrl: 'templates/configuracion.html',
-          controller: 'configCtrl'
-        }
+  .state('reportar', {
+    url: '/reportar/:tipo',
+    views: {
+      'content': {
+        templateUrl: 'templates/reportar.html',
+        controller: 'reportCtrl'
       }
+    }
+  })
 
-    });
+  .state('configuracion', {
+    url: '/config',
+    views: {
+      'content': {
+        templateUrl: 'templates/configuracion.html',
+        controller: 'configCtrl'
+      }
+    }
+  })
+
+  .state('solicitar', {
+    url: '/editor',
+    views: {
+      'content': {
+        templateUrl: 'templates/solicitar.html',
+        controller: 'configCtrl'
+      }
+    }
+  });
+
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/login');

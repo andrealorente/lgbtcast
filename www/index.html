@@ -47,8 +47,7 @@
       <ion-side-menu-content>
 
         <ion-nav-bar class="bar-positive">
-          <ion-nav-back-button>
-          </ion-nav-back-button>
+          <ion-nav-back-button></ion-nav-back-button>
 
           <ion-nav-buttons side="left">
             <button class="button button-icon button-clear ion-navicon" menu-toggle="left"></button>
@@ -69,14 +68,14 @@
         <ion-content>
           <div class="sidemenu-perfil">
             <img src="https://s3.amazonaws.com/ionic-io-static/9zr7aST8QmKTZ60SJAYS_ed87f5e227d2c5adfc9cb0fd62349300.jpg" alt="">
-            <h3>{{myData.username}}</h3>
+            <h3>{{myData.username}} <i class="icon ion-locked" ng-hide="myData.public=='true'"></i></h3>
             <p>{{myData.name}}</p>
           </div>
           <ion-list>
-            <ion-item class="item-icon-left" menu-close ui-sref="perfil({id: myData.id})"><i class="icon ion-android-person"></i>Mi perfil</ion-item>
-            <ion-item class="item-icon-left" menu-close ng-show="myData.public=='false'" ui-sref="lista({id: myData.id, caso: 'peticiones'})"><i class="icon ion-android-person-add"></i>Solicitudes de seguimiento</ion-item>
-            <ion-item class="item-icon-left" menu-close href="#/config"><i class="icon ion-android-settings"></i>Configuración</ion-item>
-            <ion-item class="item-icon-left" menu-close href="#/editor"><i class="icon ion-email"></i>Hacerme editor</ion-item>
+            <ion-item class="item-icon-left" menu-toggle ui-sref="perfil({id: myData.id})"><i class="icon ion-android-person"></i>Mi perfil</ion-item>
+            <ion-item class="item-icon-left" menu-toggle ng-hide="myData.public=='true'" ui-sref="lista({id: myData.id, caso: 'peticiones'})"><i class="icon ion-android-person-add"></i>Solicitudes de seguimiento</ion-item>
+            <ion-item class="item-icon-left" menu-toggle href="#/config"><i class="icon ion-android-settings"></i>Configuración</ion-item>
+            <ion-item class="item-icon-left" menu-toggle href="#/editor"><i class="icon ion-email"></i>Hacerme editor</ion-item>
           </ion-list>
         </ion-content>
       </ion-side-menu>

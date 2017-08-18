@@ -1,7 +1,9 @@
 {
   "project_info": {
     "project_number": "143727678995",
-    "project_id": "lgbtcast-tfg"
+    "firebase_url": "https://lgbtcast-tfg.firebaseio.com",
+    "project_id": "lgbtcast-tfg",
+    "storage_bucket": "lgbtcast-tfg.appspot.com"
   },
   "client": [
     {
@@ -12,6 +14,10 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "143727678995-k753n03njc19ub2u8lc3cmuoa54lr475.apps.googleusercontent.com",
+          "client_type": 3
+        },
         {
           "client_id": "143727678995-oq0cj7ucheb35tbpcfuv5b8ih9dkvb7i.apps.googleusercontent.com",
           "client_type": 1,
@@ -35,11 +41,16 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "143727678995-k753n03njc19ub2u8lc3cmuoa54lr475.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
-          "status": 1
+          "status": 2
         }
       }
     }
