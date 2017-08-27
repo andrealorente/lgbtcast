@@ -2,12 +2,11 @@
   <ion-nav-buttons side="right" class="has-header">
     <button class="button button-icon icon ion-android-send" ng-click="editarUsuario(datos)"> Guardar</button>
   </ion-nav-buttons>
-  <ion-content padding="true" class=" manual-remove-top-padding has-header" ng-init="cargarMisDatos()">
-    <div style="margin: 0px; line-height: 250px; background-color: rgb(232, 235, 239); text-align: center;">
-      <i class="icon ion-image" style="font-size: 64px; color: rgb(136, 136, 136); vertical-align: middle;"></i>
+  <ion-content padding="false" class=" manual-remove-top-padding has-header" ng-init="cargarMisDatos()">
+    <div style="padding: 20px;">
+      <img id="user_image" style="display:block; border-radius: 50%; margin: 0 auto;" src="{{datos.image}}" width="150" height="150" />
+      <a ng-click="cargarImagen()">Cargar imagen</a>
     </div>
-    <a ng-click="cargarImagen()">Cargar imagen</a>
-    <img style="display:block;" id="picture" src="" width="150" height="150" />
     <form class="list">
       <label class="item item-input item-stacked-label">
         <span class="input-label">Nombre de usuario</span>

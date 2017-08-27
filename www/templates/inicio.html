@@ -1,11 +1,11 @@
-<ion-view title="Inicio">
+<ion-view title="Inicio" cache-view="true">
   <ion-content>
   <ion-refresher on-refresh="refrescarPosts()"></ion-refresher>
     <div class="list" tagged-infinite-scroll="cargarPosts()">
 
       <div class="list card" ng-repeat="post in posts">
         <div class="item item-avatar">
-          <img src="https://s3.amazonaws.com/ionic-io-static/9zr7aST8QmKTZ60SJAYS_ed87f5e227d2c5adfc9cb0fd62349300.jpg">
+          <img src="{{post.author_data.image}}">
           <h2 ui-sref="perfil({id: post.author_id})">{{post.author_data.username}}</h2>
           <p am-time-ago="post.created_time"></p>
         </div>
@@ -13,7 +13,7 @@
           <img class="full-image" ng-if="post.image!=null" ng-src="http://res.cloudinary.com/tfg-lgbt-cloud/image/upload/v{{post.image}}.jpg">
           <p>{{post.title}}</p>
           <p>
-            <a href="#" class="subdued"><i class="icon ion-heart"></i> {{post.likes.length}} Like</a>
+            <a href="#" class="subdued"><i class="icon ion-ios-heart"></i> {{post.likes.length}} me gusta</a>
             <a href="#" class="subdued">5 comentarios</a>
           </p>
         </div>

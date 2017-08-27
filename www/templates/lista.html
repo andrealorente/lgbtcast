@@ -2,7 +2,7 @@
   <ion-content ng-init="cargarLista()">
     <ion-list>
       <ion-item class="item item-avatar item-button-right" ng-repeat="item in lista">
-        <img>
+        <img src="{{item.user.image}}">
         <h2 ui-sref="perfil({id: item.user.id})">
           {{item.user.username}}
           <i class="icon ion-locked" ng-hide="item.user.public"></i>

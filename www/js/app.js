@@ -28,7 +28,7 @@ angular.module('app', ['ionic', 'app.controllers','angularMoment','ion-floating-
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
+.config(function($stateProvider, $urlRouterProvider, $httpProvider, ) {
   $stateProvider
 
     .state('login', {
@@ -199,7 +199,7 @@ angular.module('app', ['ionic', 'app.controllers','angularMoment','ion-floating-
     views: {
       'content': {
         templateUrl: 'templates/buscar.html',
-        controller: 'perfilCtrl'
+        controller: 'buscarCtrl'
       }
     }
   })
@@ -215,7 +215,7 @@ angular.module('app', ['ionic', 'app.controllers','angularMoment','ion-floating-
   })
 
   .state('reportar', {
-    url: '/reportar/:tipo',
+    url: '/reportar/:tipo/:id',
     views: {
       'content': {
         templateUrl: 'templates/reportar.html',
@@ -229,6 +229,46 @@ angular.module('app', ['ionic', 'app.controllers','angularMoment','ion-floating-
     views: {
       'content': {
         templateUrl: 'templates/configuracion.html',
+        controller: 'configCtrl'
+      }
+    }
+  })
+
+  .state('privacidad', {
+    url: '/config/privacidad',
+    views: {
+      'content': {
+        templateUrl: 'templates/config/privacidad.html',
+        controller: 'configCtrl'
+      }
+    }
+  })
+
+  .state('cambiarpswd', {
+    url: '/config/contrasena',
+    views: {
+      'content': {
+        templateUrl: 'templates/config/contraseña.html',
+        controller: 'configCtrl'
+      }
+    }
+  })
+
+  .state('politica', {
+    url: '/config/politica',
+    views: {
+      'content': {
+        templateUrl: 'templates/config/politica.html',
+        controller: 'configCtrl'
+      }
+    }
+  })
+
+  .state('sobreapp', {
+    url: '/config/sobreapp',
+    views: {
+      'content': {
+        templateUrl: 'templates/config/sobreapp.html',
         controller: 'configCtrl'
       }
     }

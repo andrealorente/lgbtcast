@@ -1,5 +1,21 @@
 <ion-view title="Cambiar contraseña">
-  <ion-content>
-  
-  </ion-content>
+	<ion-content padding="true">
+	<form class="list">
+		<label class = "item-floating-label">
+		<span class = "input-label">Contraseña actual</span>
+		<input type = "password" placeholder="Contraseña actual" ng-model="user.oldpswd" />
+		</label>
+
+		<label class = "item-floating-label">
+			<span class = "input-label">Nueva contraseña</span>
+			<input type = "password" placeholder = "Aquí la nueva contraseña" ng-model="user.newpswd" />
+		</label>  
+		<label class = "item-floating-label">
+			<span class = "input-label">Confirmar nueva contraseña</span>
+			<input type = "password" placeholder = "Aquí la nueva contraseña" ng-model="user.newpswd2" />
+		</label>  
+
+		<a ng-click="cambiarContrasena(user)" class="button button-positive button-block">Cambiar contraseña</a>
+		</form>
+	</ion-content>
 </ion-view>

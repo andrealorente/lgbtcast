@@ -1,5 +1,5 @@
 <ion-view view-title="Buscar">
-<ion-tabs class="tabs-icon-top tabs-positive">
+<!--ion-tabs class="tabs-icon-top tabs-positive">
 
     <ion-tab title="Contenido" icon="ion-home" href="#/tab/inicio">
       <ion-nav-view name="tab-inicio"></ion-nav-view>
@@ -9,13 +9,44 @@
       <ion-nav-view name="tab-calendario"></ion-nav-view>
     </ion-tab>
 
-  </ion-tabs>
+  </ion-tabs-->
   <ion-content>
+    <input placeholder="Búsqueda de publicaciones, canales, etc" type="text" ng-model="busqueda.texto">
+    <button class="button button-positive button-block" ng-click="buscar(busqueda)">Buscar</button>
+    
+    <h4>Personas</h4>
+    <ion-list id="users-list">
+      <ion-item class="item item-avatar item-button-right" ng-repeat="item in lista">
+        <img src="{{item.image}}">
+        <h2 ui-sref="perfil({id: item.id})">
+          {{item.username}}
+          <i class="icon ion-locked" ng-hide="item.public"></i>
+        </h2>
+        <p style="white-space:normal;">{{item.name}}</p>
+      </ion-item>
+    </ion-list>
 
-    <h1>Search</h1>
-    <input placeholder="Nombre de usuario o email" type="text">
-    <button class="button button-positive">Buscar</button>
+    <h4>Publicaciones</h4>
+    <ion-list>
+      
+    </ion-list>
 
+    <h4>Canales</h4>
+    <ion-list>
+      <ion-item class="item-avatar" ng-repeat="canal in channels" ui-sref="tab.canal({id: canal.id})">
+        <img src="https://s3.amazonaws.com/ionic-io-static/blfWoyQqS9UHGXQ2XwwB_e870c4db344ae9e5ac5d8d2c5488d5b1.jpg">
+        <h2>{{canal.title}}</h2>
+        <p>{{canal.description}}</p>
+      </ion-item>
+    </ion-list>
 
+    <h4>Eventos</h4>
+    <ion-list>
+      <ion-item class="item-thumbnail-left" ng-repeat="ev in eventos" ui-sref="tab.evento({id: ev.id})">
+        <img>
+        <h2>{{ev.title}}</h2>
+        <p style="white-space:normal;">{{ev.description}}</p>
+      </ion-item>
+    </ion-list>
   </ion-content>
 </ion-view>

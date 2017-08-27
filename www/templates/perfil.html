@@ -3,18 +3,21 @@
     <div id="profile-bg"></div>
     <ion-slides disable-side-menu-drag="" options="{'loop': false}" slider="slider" delegate-handle="slider" id="profile-info">
       <ion-slide-page style="">
-        <img id="profile-image" src="https://s3.amazonaws.com/ionic-io-static/9zr7aST8QmKTZ60SJAYS_ed87f5e227d2c5adfc9cb0fd62349300.jpg">
-        <h3 id="profile-name">{{usuario.username}} <i class="icon ion-locked" ng-hide="usuario.public"></i></h3>
-        <h4>{{usuario.name}}</h4>
+        <img id="profile-image" src="{{usuario.image}}">
+        <h4 id="profile-name">{{usuario.username}} <i class="icon ion-locked" ng-hide="usuario.public"></i></h4>
+        <h5>{{usuario.name}}</h5>
         <span id="profile-description">{{usuario.bio}}</span>
+        <span>Lugar: {{usuario.place}}</span>
+        <span>Género: {{usuario.gender}}</span>
+        <span>Hola</span>
         <button class="button button-positive button-block" ng-click="seguirUsuario()" ng-hide="soyYo(usuario.id)">{{botonMsg}}</button>
       </ion-slide-page>
       <ion-slide-page style="">
-
+        
       </ion-slide-page>
     </ion-slides>
 
-    <button class="button button-positive button-block icon-right ion-edit" ng-show="soyYo(usuario.id)" ui-sref="editar">Editar perfil</button>
+    <button style="margin: 0px!important;" class="button button-positive button-block icon-right ion-edit custom-positive" ng-show="soyYo(usuario.id)" ui-sref="editar">Editar perfil</button>
     <div class="button-bar">
       <button class="button button-positive button-block button-outline" ui-sref="lista({id: usuario.id, caso: 'seguidores'})">{{usuario.counts.followedby}} seguidor</button>
       <button class="button button-positive button-block button-outline" ui-sref="lista({id: usuario.id, caso: 'siguiendo'})">{{usuario.counts.following}} siguiendo</button>
@@ -23,7 +26,7 @@
     <!--Actividad -->
     <ion-list ng-if="mostrarAct">
       <ion-item class="item-avatar" ng-repeat="act in usuario.activity | orderBy: '-created_time'">
-       <img src="https://s3.amazonaws.com/ionic-io-static/9zr7aST8QmKTZ60SJAYS_ed87f5e227d2c5adfc9cb0fd62349300.jpg">
+       <img src="{{usuario.image}}">
        <h2>
         {{usuario.username}}
         <small style="font-size: 80%; color: #BDBCBC;" am-time-ago="act.created_time"></small>

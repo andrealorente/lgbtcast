@@ -3,6 +3,21 @@
 /* PRIMARY COLOR: #9c27b0; */
 /* ACCENT COLOR: ; #ff4081*/
 
+.custom-positive{
+    
+    background-color: #9c27b0!important;
+    border:0;
+ }
+
+.tab-nav, .tabs {
+  background-color: #9c27b0!important;
+  color: white;
+}
+
+.tab-item.tab-item-active, .tab-item.active, .tab-item.activated {
+    color: white !important;
+  }
+
 .sidemenu-perfil {
   padding: 20px;
   background: #51d0d5;
@@ -73,16 +88,41 @@ top: -5px;
 .channel-info {
   padding: 10px;
   text-align: center;
-  background: white;
-
+  background: #1de9b6;
+  position: fixed;
+  z-index: 1000;
+  width: 100%;
+  box-shadow: 0.3px 0px 5px 3px #AEABAB;
 }
 
 .channel-content {
   background-color: #c9cdd1;
   padding: 10px 0px 10px 10px;
+  height: 500px;
+  padding-top: 120px;
 }
 
 .message-bubble small{
   margin-left: 155px;
   color: #6272e7;
+}
+
+input {
+  width: 100%;
+}
+
+.input-label {
+  width: 100%;
+}
+
+.login-input {
+  background: none;
+  color: #FFF;
+  border-bottom: 1px solid #FFF !important;
+}
+
+.login-button {
+  background: #4d088d!important;
+  color: #FFF!important;
+  border-radius: 20px;
 }

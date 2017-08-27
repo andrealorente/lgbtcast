@@ -34,6 +34,10 @@
     <link href="lib/ion-floating-menu/dist/ion-floating-menu.css" rel="stylesheet" type="text/css"/>
     <script src="lib/ion-floating-menu/dist/ion-floating-menu.js" type="text/javascript"></script>
 
+    <!-- Sockets -->
+    <script src="https://lgbt-api.herokuapp.com/socket.io/socket.io.js"></script>
+    <script src="lib/angular-socket-io/socket.js"></script>
+
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
 
@@ -46,7 +50,7 @@
     <ion-side-menus enable-menu-with-back-views="false" ng-controller="AppCtrl">
       <ion-side-menu-content>
 
-        <ion-nav-bar class="bar-positive">
+        <ion-nav-bar class="bar-positive custom-positive">
           <ion-nav-back-button></ion-nav-back-button>
 
           <ion-nav-buttons side="left">
@@ -67,7 +71,7 @@
 
         <ion-content>
           <div class="sidemenu-perfil">
-            <img src="https://s3.amazonaws.com/ionic-io-static/9zr7aST8QmKTZ60SJAYS_ed87f5e227d2c5adfc9cb0fd62349300.jpg" alt="">
+            <img src="{{myData.image}}" alt="">
             <h3>{{myData.username}} <i class="icon ion-locked" ng-hide="myData.public=='true'"></i></h3>
             <p>{{myData.name}}</p>
           </div>

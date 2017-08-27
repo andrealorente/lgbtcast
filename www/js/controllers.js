@@ -1,6 +1,28 @@
-angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScroll'])
+angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScroll', 'btford.socket-io'])
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
+.factory('socket',function(socketFactory){
+  var myIoSocket = io.connect('https://lgbt-api.herokuapp.com');
+
+  mySocket = socketFactory({
+    ioSocket: myIoSocket
+  });
+
+  return mySocket;
+})
+
+.factory('ContadorMsg', function(){
+  return {
+    count: 0,
+    increase: function(){
+      this.count++;
+    },
+    decrease: function() {
+      this.count--;
+    }
+  }
+})
+
+.controller('AppCtrl', function($scope, $ionicModal, $timeout, socket, ContadorMsg) {
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -14,8 +36,26 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
       id: localStorage.getItem("user_id"),
       username: localStorage.getItem("user_username"),
       name: localStorage.getItem("user_name"),
-      public: localStorage.getItem("user_public")
+      public: localStorage.getItem("user_public"),
+      image: localStorage.getItem("user_image"),
+      noleidos: ContadorMsg.count
     };
+
+    setTimeout(function(){
+      if(typeof FCMPlugin != 'undefined'){
+      FCMPlugin.onNotification(function(data){
+        ContadorMsg.increase();
+        if(data.wasTapped){
+          //Notification was received on device tray and tapped by the user.
+          alert(JSON.stringify(data));
+        }else{
+          //Notification was received in foreground. Maybe the user needs to be notified.
+          alert(JSON.stringify(data));
+        }
+      });
+      }
+    }, 1000);
+
   });
   $scope.$on('$ionicView.beforeEnter', function (event, viewData) {
     viewData.enableBack = true;
@@ -77,7 +117,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
       window.plugins.toast.showLongBottom('Tienes que rellenar los campos', function(a){
       console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
     } else {
-      $scope.showerror = false;
+
       var pswd = md5.createHash($scope.user.password || '');
 
       $json_post = {
@@ -101,6 +141,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
             localStorage.setItem("user_name", data.data.name);
             localStorage.setItem("user_token", data.token);
             localStorage.setItem("user_public", data.data.public);
+            localStorage.setItem("user_image", data.data.image);
 
             FCMPlugin.getToken(function(token) {
               // save this server-side and use it to push notifications to this device
@@ -151,6 +192,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
           localStorage.setItem("user_username", res.data.data.username);
           localStorage.setItem("user_token", res.data.token);
           localStorage.setItem("user_public", res.data.data.public);
+          localStorage.setItem("user_image", res.data.data.image);
           
           $state.go('tab.inicio');
         }else{
@@ -183,8 +225,9 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
         alert(JSON.stringify(obj)); // do something useful instead of alerting
         console.log(obj);
         $json_post = {
-          email: obj.email, //Mirar cómo se llaman los valores estos imprimiendo el obj
-          name: obj.name 
+          email: obj.email, 
+          name: obj.displayName,
+          image: obj.imageUrl
         };
 
         $http.post(BASE_URL+'/users/login/google').then(function(response){
@@ -293,6 +336,10 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     $http.get(BASE_URL+'/posts/'+$stateParams.id).then(function(response){
       $scope.post = response.data.data;
       $scope.post.id = $stateParams.id;
+
+      if($scope.post.likes.indexOf(localStorage.getItem("user_id"))==-1)
+        $scope.liked = false;
+      else $scope.liked = true;
       console.log(response);
     }, function(error){
         console.log("Error: "+error);
@@ -300,6 +347,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   };
 
   $scope.likePost = function() {
+    $scope.liked = !$scope.liked;
     var url = '/posts/' + $stateParams.id + '/likes';
     $http.post(BASE_URL + url).then(function(response){
       if(response.data.success){
@@ -482,10 +530,20 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   };
 })
 
-.controller('canalesCtrl', function($scope, $http, $stateParams, $ionicPopover) {
+.controller('canalesCtrl', function($scope, $http, $stateParams, $ionicPopover, $ionicScrollDelegate, socket, $state) {
   $scope.miscanales = [];
   $scope.canales = [];
   $scope.suscBtn = "Suscribirme";
+
+  socket.on('chat message', function(msg){ //Añadir los mensajes que te llegan
+    alert(msg);
+    console.log($state.current);
+  });
+
+  $scope.$on('$ionicView.beforeLeave', function() {
+    if($state.current.name=="tab.canal")
+      socket.emit('leave', $stateParams.id);
+  });
 
   $scope.cargarCanales = function() {
     $http.get(BASE_URL+'/channels').then(function(response){
@@ -521,6 +579,11 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
           $scope.suscBtn = "Suscribirme";
         else
           $scope.suscBtn = "Eliminar suscripción";
+
+        $ionicScrollDelegate.scrollBottom(true);
+
+        //Join con los sockets en la sala del canal
+        socket.emit('join', $stateParams.id);
       }
     },function(error){
 
@@ -536,6 +599,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
         //Cambiar el mensaje del botón
         if($scope.suscBtn=="Suscribirme"){
           $scope.suscBtn = "Eliminar suscripción";
+          
           //Suscribirme al topic del canal
           FCMPlugin.subscribeToTopic($stateParams.id, function(msg){
             console.log(msg);
@@ -544,14 +608,18 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
             alert("Error");
             console.log("Error suscribiéndome al topic de firebase");
           });
+
+
         }else{
           $scope.suscBtn = "Suscribirme";
+          socket.emit('leave', 'canal');
           FCMPlugin.unsubscribeFromTopic($stateParams.id, function(msg){
             console.log(msg);
             alert(msg);
           }, function(err){
             console.log("Error suscribiéndome al topic de firebase");
           });
+          
         }
       }
     },function(error){
@@ -596,9 +664,10 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
 
 })
 
-.controller('perfilCtrl', function($scope, $stateParams,$http,$state,$ionicLoading) {
+.controller('perfilCtrl', function($scope, $stateParams,$http,$state,$ionicLoading,$ionicHistory) {
   $scope.usuario = {};
   $scope.datos = {};
+  $scope.image = "";
 
   //Función para mostrar (o no) funcionalidades
   $scope.soyYo = function(id){
@@ -631,11 +700,13 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
       //Obtener la relación con el otro usuario si no estoy cargando mi perfil
       if(!$scope.soyYo($stateParams.id)){
         $http.get(BASE_URL+'/users/' + $stateParams.id + '/relationship').then(function(response2){
+          console.log(response2);
           if(response2.data.success){
             //Mostrar o no la actividad (si el usuario tiene el perfil privado)
             if($scope.usuario.public == false && response2.data.data.outgoing == "follows"){
               $scope.mostrarAct = true;
             }
+            $scope.botonMsg = "Seguir";
             //Ver qué debe de poner en el botón de seguir
             if(response2.data.data.outgoing == "follows") $scope.botonMsg = "Siguiendo";
             else if(response2.data.outgoing == "requested") $scope.botonMsg = "Solicitado";
@@ -743,7 +814,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
 
     $json_post = { action: accion }; //valores: follow || request || unfollow || approve || ignore
     //Enviar post
-    $http.post(BASE_URL + '/users/'+ userid +'/relationship',$json_post).then(function(response){
+    $http.post(BASE_URL + '/users/'+ $stateParams.id +'/relationship',$json_post).then(function(response){
       if(response.data.success){
         console.log("Acción realizada correctamente.");
       }
@@ -768,42 +839,74 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
 
   $scope.editarUsuario = function() {
 
-    $json_post = {
-      user_username: datos.username,
-      user_name: datos.name,
-      user_bio: datos.bio,
-      user_email: datos.email,
-      user_gender: datos.gender,
-      user_place: datos.place,
-      user_image: datos.image
-    };
+    var options = new FileUploadOptions();
+    options.fileKey = "file";
+    options.fileName = $scope.image.substr($scope.image.lastIndexOf('/') + 1);
+    options.mimeType = "image/jpeg";
+    options.chunkedMode = false;
 
-    $http.post(BASE_URL+'/users/'+ localStorage.getItem("user_id"), $json_post).then(function(response){
-      console.log(response.data);
-      if(!response.data.success)
-        alert(response.data.error.message);
-    },function(error){  
-      console.log(error);
-    });
+    var params = {};
+    params.api_key = "479641643612759";
+    params.timestamp = Math.floor(Date.now() / 1000);
+    params.upload_preset = 'eix6ihmq';
+
+    options.params = params;
+
+    var ft = new FileTransfer();
+    ft.upload($scope.image, encodeURI("https://api.cloudinary.com/v1_1/tfg-lgbt-cloud/image/upload/"), 
+      function(r){
+        var obj = JSON.parse(r.response);
+        console.log(obj);
+        var imageURL = obj.url;
+      
+        $json_post = {
+          user_username: $scope.datos.username,
+          user_name: $scope.datos.name,
+          user_bio: $scope.datos.bio,
+          user_email: $scope.datos.email,
+          user_gender: $scope.datos.gender,
+          user_place: $scope.datos.place,
+          user_image: imageURL
+        };
+
+        $http.post(BASE_URL+'/users/'+ localStorage.getItem("user_id"), $json_post).then(function(response){
+          $ionicLoading.show({template: 'Guardando datos...'});
+          console.log(response.data);
+          if(!response.data.success){
+            window.plugins.toast.showLongBottom(response.data.error.message, function(a){
+            console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+          }else{
+            $ionicLoading.hide();
+            $ionicHistory.goBack();
+          }
+
+
+        },function(error){  
+          console.log(error);
+        });
+      }, $scope.fail, options,true);
+    
   };
 
   $scope.win = function (r) {
     $ionicLoading.hide();
     console.log("Code = " + r.responseCode);
+    console.log(r.response);
     alert("Response = " + r.response);
     console.log("Sent = " + r.bytesSent);
   };
 
   $scope.fail = function (error) {
       alert("An error has occurred: Code = " + error.code);
-      console.log("upload error source " + error.source);
-      console.log("upload error target " + error.target);
+      window.plugins.toast.showLongBottom('Ha habido un error, prueba de nuevo.', function(a){
+            console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
   };
 
   $scope.onSuccess = function(imageURI) {
-    var image = document.getElementById('picture');
-
-    $ionicLoading.show({template: 'Enviando la imagen...'});
+    var image = document.getElementById('user_image');
+    image.src= imageURI;
+    $scope.image = imageURI;
+    /*$ionicLoading.show({template: 'Guardando la imagen...'});
     var options = new FileUploadOptions();
     options.fileKey = "file";
     options.fileName = imageURI.substr(imageURI.lastIndexOf('/') + 1);
@@ -818,7 +921,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     options.params = params;
 
     var ft = new FileTransfer();
-    ft.upload(imageURI, encodeURI("https://api.cloudinary.com/v1_1/tfg-lgbt-cloud/image/upload/"), $scope.win, $scope.fail, options,true);
+    ft.upload(imageURI, encodeURI("https://api.cloudinary.com/v1_1/tfg-lgbt-cloud/image/upload/"), $scope.win, $scope.fail, options,true);*/
   };
 
   $scope.onFail = function(message) {
@@ -866,14 +969,77 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
 
 })
 
-.controller('reportCtrl', function($scope, $http, $ionicHistory){
-  $scope.enviar = function() {
-    $json_post = {};
-    $http.post(BASE_URL+'/report', $json_post).then(function(response){
+.controller('buscarCtrl', function($scope,$http,$state){
+  $scope.busqueda = {};
 
+  $scope.buscar = function() {
+    console.log($scope.busqueda.texto);
+    //Buscar usuario, post, canal, evento
+    
+    $http.get(BASE_URL+'/search/users?text='+$scope.busqueda.texto).then(function(resultado){
+      console.log(resultado.data);
+      $scope.lista = resultado.data.data;
     }, function(error){
       console.log(error);
     });
+
+    $http.get(BASE_URL+'/search/channels?text='+$scope.busqueda.texto).then(function(resultado){
+      console.log(resultado.data);
+      $scope.channels = resultado.data.data;
+    }, function(error){
+      console.log(error);
+    });
+
+    $http.get(BASE_URL+'/search/events?text='+$scope.busqueda.texto).then(function(resultado){
+      console.log(resultado.data);
+      $scope.eventos = resultado.data.data;
+    }, function(error){
+      console.log(error);
+    });
+  };
+})
+
+.controller('reportCtrl', function($scope, $http, $ionicHistory, $stateParams){
+  $scope.num = 0;
+  $scope.enviar = function() {
+    var r;
+    switch($scope.num) {
+      case 0: window.plugins.toast.showLongBottom('Selecciona una opción', function(a){
+            console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)}); return;
+      case 1: r = "Está siendo ofensivo o perjudicial"; break;
+      case 2: r = "Está participando en algún tipo de acoso"; break;
+      case 3: r = "No es adecuado"; break;
+      case 4: r = "Es spam"; break;
+    }
+
+    var type;
+    if($stateParams.tipo = "usuario") type = 1;
+    else if($stateParams.tipo = "comentario") type = 2;
+    else if($stateParams.tipo = "canal") type = 3;
+
+    $json_post = {
+      target_id: $stateParams.id,
+      target_type: type,
+      reason: r
+    };
+    $http.post(BASE_URL+'/report', $json_post).then(function(response){
+      if(!response.data.success){
+        window.plugins.toast.showLongBottom(response.data.error.message, function(a){
+            console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+      }else{
+        window.plugins.toast.showLongBottom('Reporte enviado correctamente', function(a){
+            console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        $ionicHistory.goBack();
+      }
+    }, function(error){
+      console.log(error);
+    });
+  };
+
+  $scope.marcar = function(n) {
+    if($scope.num == n)
+      $scope.num = 0;
+    else $scope.num = n;
   };
 
   $scope.irAtras = function() {
@@ -881,16 +1047,48 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   };
 })
 
-.controller('configCtrl', function($scope, $stateParams,$state,$ionicHistory) {
+.controller('configCtrl', function($scope, $stateParams,$state,$ionicHistory, md5, $http) {
 
   $scope.fontSize = function() {
 
   };
 
+  $scope.user = {};
+  $scope.cambiarContrasena = function() {
+
+    if($scope.user.newpswd == $scope.user.newpswd2) {
+      var oldpswd = md5.createHash($scope.user.oldpswd || '');
+      var newpswd = md5.createHash($scope.user.newpswd || '');
+
+      $json_post = {
+        user_oldpswd: oldpswd,
+        user_newpswd: newpswd 
+      };
+      $http.post(BASE_URL+'/password',$json_post).then(function(response){
+        if(!response.data.success)
+          window.plugins.toast.showLongBottom(response.data.error.message, function(a){
+            console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        window.plugins.toast.showLongBottom('Se ha cambiado la contraseña correctamente', function(a){
+          console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+      }, function(error){
+        console.log(error);
+      });
+    }else{
+      window.plugins.toast.showLongBottom('Las contraseñas no coinciden', function(a){
+        console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+    }
+    
+  };
+
+  if(localStorage.getItem("user_public")=="false")
+    $scope.privado = true;
+  else $scope.privado = false;
+  
   $scope.perfilPrivado = function(){
-    $json_post = {};
-    $http.post(BASE_URL+'/users/edit', $json_post).then(function(response){
-      console.log(respone.data);
+
+    $http.post(BASE_URL+'/privacity').then(function(response){
+      console.log(response.data);
+      localStorage.setItem("user_public", response.data.data);
     }, function(error){
       console.log(error);
     });
@@ -900,5 +1098,19 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     localStorage.clear();
     $ionicHistory.clearCache();
     $state.go('login');
+  };
+
+  //Solicitud de convertirse en editor
+  $scope.enviarSolicitud = function() {
+    /*$json_post = {
+
+    };
+
+    $http.post(BASE_URL+'/editor', $json_post).then(function(response) {
+
+    }, function(error) {
+
+    });*/
+    $state.go('tab.inicio');
   };
 });

@@ -1,7 +1,8 @@
 <ion-view title="Inicio"><!-- Arreglar esto para que no se ponga Inicio en cualquier otra pestaña -->
-<ion-tabs class="tabs-icon-top tabs-positive">
+<ion-tabs class="tabs-icon-top custom-positive">
 
     <ion-tab title="Inicio" icon="ion-home" href="#/tab/inicio">
+
       <ion-nav-view name="tab-inicio"></ion-nav-view>
     </ion-tab>
 
@@ -9,7 +10,7 @@
       <ion-nav-view name="tab-calendario"></ion-nav-view>
     </ion-tab>
 
-    <ion-tab title="Canales" icon="ion-chatbubble" ui-sref="tab.canales">
+    <ion-tab title="Canales" icon="ion-chatbubble" ui-sref="tab.canales" badge="myData.noleidos" badge-style="badge-assertive">
       <ion-nav-view name="tab-canales"></ion-nav-view>
     </ion-tab>
 
