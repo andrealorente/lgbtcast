@@ -1,8 +1,9 @@
 <ion-view title="Hacerme editor">
 <ion-nav-buttons side="right" class="has-header">
-    <button class="button button-icon icon ion-android-send" ng-click="enviarSolicitud()"></button>
+    <button class="button button-icon icon ion-android-send" ng-click="enviarSolicitud(user)"></button>
   </ion-nav-buttons>
   <ion-content padding="true">
+  <div>
   	<h3>¿Quieres formar parte de la comunidad de LGBTcast y aportar contenidos a la aplicación?</h3>
   	<p>Rellena el formulario siguiente y nos pondremos en contacto contigo a través del 
   	correo electrónico que nos proporciones.</p>
@@ -10,24 +11,29 @@
 
 		   <label class = "item-floating-label">
 		      <span class = "input-label">Correo</span>
-		      <input type = "text" placeholder = "Correo" />
+		      <input type = "text" placeholder = "Correo" ng-model="user.email" />
 		   </label>
 
 		   <label class = "item-floating-label">
 		      <span class = "input-label">Nombre y apellidos</span>
-		      <input type = "text" placeholder = "Nombre y apellidos" />
+		      <input type = "text" placeholder = "Nombre y apellidos" ng-model="user.name" />
 		   </label>
 
 		   <label class = "item-floating-label">
 		      <span class = "input-label">Organización o colectivo</span>
-		      <input type = "text" placeholder = "Nombre de la organización o colectivo" />
+		      <input type = "text" placeholder = "Nombre de la organización o colectivo" ng-model="user.org" />
 		   </label>
 
 		   <label class = "item-floating-label">
 		      <span class = "input-label">Motivo</span>
-		      <input type = "text" placeholder = "Motivo(s) para unirte a LGBTcast como editor" style="border-bottom: 1px solid #DDD;"/>
+		      <input type = "text" placeholder = "Motivo(s) para unirte a LGBTcast como editor" style="border-bottom: 1px solid #DDD;" ng-model="user.reason" />
 		   </label>
 
     </form>
+    </div>
+    <div>
+    	<h3>Gracias por tu solicitud de editor</h3>
+    	<p>Cuando procesemos tu solicitud para ser editor de LGBTcast se te avisará con un correo.</p>
+    </div>
   </ion-content>
 </ion-view>

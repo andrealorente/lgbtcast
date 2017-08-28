@@ -79,7 +79,7 @@
             <ion-item class="item-icon-left" menu-toggle ui-sref="perfil({id: myData.id})"><i class="icon ion-android-person"></i>Mi perfil</ion-item>
             <ion-item class="item-icon-left" menu-toggle ng-hide="myData.public=='true'" ui-sref="lista({id: myData.id, caso: 'peticiones'})"><i class="icon ion-android-person-add"></i>Solicitudes de seguimiento</ion-item>
             <ion-item class="item-icon-left" menu-toggle href="#/config"><i class="icon ion-android-settings"></i>Configuración</ion-item>
-            <ion-item class="item-icon-left" menu-toggle href="#/editor"><i class="icon ion-email"></i>Hacerme editor</ion-item>
+            <ion-item class="item-icon-left" menu-toggle href="#/editor" ng-hide="myData.role=='editor'"><i class="icon ion-email"></i>Hacerme editor</ion-item>
           </ion-list>
         </ion-content>
       </ion-side-menu>

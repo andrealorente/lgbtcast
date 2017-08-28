@@ -38,6 +38,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
       name: localStorage.getItem("user_name"),
       public: localStorage.getItem("user_public"),
       image: localStorage.getItem("user_image"),
+      role: localStorage.getItem("user_role"),
       noleidos: ContadorMsg.count
     };
 
@@ -142,6 +143,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
             localStorage.setItem("user_token", data.token);
             localStorage.setItem("user_public", data.data.public);
             localStorage.setItem("user_image", data.data.image);
+            localStorage.setItem("user_role", data.data.role);
 
             FCMPlugin.getToken(function(token) {
               // save this server-side and use it to push notifications to this device
@@ -193,6 +195,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
           localStorage.setItem("user_token", res.data.token);
           localStorage.setItem("user_public", res.data.data.public);
           localStorage.setItem("user_image", res.data.data.image);
+          localStorage.setItem("user_role", res.data.data.role);
           
           $state.go('tab.inicio');
         }else{
@@ -231,9 +234,9 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
         };
 
         $http.post(BASE_URL+'/users/login/google').then(function(response){
-
+          console.log(response);
         }, function(error){
-
+          console.log(error);
         });
       },
       function (msg) {
@@ -402,7 +405,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
 
   $scope.cargarEventos = function() {
     var hoy = new Date();
-    var url = '/events?month='+ hoy.getMonth() + '&year=' + hoy.getFullYear();
+    var url = '/events?month='+ hoy.getMonth() + '&year=' + hoy.getFullYear()+'&after='+ new Date();
     $http.get(BASE_URL+url).then(function(response){
       if(response.data.success == true){
         //Comprobar si hay eventos el mes consultado
@@ -441,7 +444,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     }
 
 
-    var url = '/events?month='+ m + '&year=' + $scope.anyo;
+    var url = '/events?month='+ m + '&year=' + $scope.anyo+'&after='+ new Date().toISOString();
     $http.get(BASE_URL + url).then(function(response){
       if (response.data.success == true) {
         console.log("Events cargados");
@@ -536,17 +539,21 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   $scope.suscBtn = "Suscribirme";
 
   socket.on('chat message', function(msg){ //Añadir los mensajes que te llegan
-    alert(msg);
-    console.log($state.current);
+    $scope.canal.messages.push({
+      content: msg,
+      created_time: new Date().toISOString()
+    });
+    $ionicScrollDelegate.scrollBottom(true);
   });
 
   $scope.$on('$ionicView.beforeLeave', function() {
-    if($state.current.name=="tab.canal")
-      socket.emit('leave', $stateParams.id);
+    console.log("VOY A SALIRRR");
+    
+    socket.emit('leave', $stateParams.id);
   });
 
   $scope.cargarCanales = function() {
-    $http.get(BASE_URL+'/channels').then(function(response){
+    $http.get(BASE_URL+'/channels?after='+new Date().toISOString()).then(function(response){
       if(response.data.success){
         $scope.canales = response.data.data;
       }
@@ -583,6 +590,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
         $ionicScrollDelegate.scrollBottom(true);
 
         //Join con los sockets en la sala del canal
+        console.log("VOY A UNIRME");
         socket.emit('join', $stateParams.id);
       }
     },function(error){
@@ -636,6 +644,14 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     $http.post(BASE_URL + url, $json_post).then(function(response){
       console.log("Notificaciones modificadas correctamente");
       //Mostrar el icono o no de silencio
+      //Hacer un suscribe o no del topic para mostrar (o no) las notificaciones
+      /*FCMPlugin.unsubscribeFromTopic($stateParams.id, function(msg){
+        console.log(msg);
+        alert(msg);
+      }, function(err){
+        console.log("Error suscribiéndome al topic de firebase");
+      });*/
+      console.log(response.data);
     },function(error){
       console.log(error);
     });
@@ -660,6 +676,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     scope: $scope,
   }).then(function(popover) {
     $scope.popover = popover;
+    console.log($scope);
   });
 
 })
@@ -999,9 +1016,11 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   };
 })
 
-.controller('reportCtrl', function($scope, $http, $ionicHistory, $stateParams){
+.controller('reportCtrl', function($scope, $http, $ionicHistory, $stateParams, $state){
   $scope.num = 0;
+  $scope.type = $stateParams.tipo;
   $scope.enviar = function() {
+    console.log($scope);
     var r;
     switch($scope.num) {
       case 0: window.plugins.toast.showLongBottom('Selecciona una opción', function(a){
@@ -1013,15 +1032,17 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     }
 
     var type;
-    if($stateParams.tipo = "usuario") type = 1;
-    else if($stateParams.tipo = "comentario") type = 2;
-    else if($stateParams.tipo = "canal") type = 3;
+    if($scope.type == "usuario") type = 1;
+    else if($scope.type == "comentario") type = 2;
+    else if($scope.type == "canal") type = 3;
+    console.log($scope.type);
 
     $json_post = {
       target_id: $stateParams.id,
       target_type: type,
       reason: r
     };
+
     $http.post(BASE_URL+'/report', $json_post).then(function(response){
       if(!response.data.success){
         window.plugins.toast.showLongBottom(response.data.error.message, function(a){
@@ -1102,15 +1123,19 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
 
   //Solicitud de convertirse en editor
   $scope.enviarSolicitud = function() {
-    /*$json_post = {
-
+    $json_post = {
+      email: $scope.user.email,
+      name: $scope.user.name,
+      org: $scope.user.org,
+      reason: $scope.user.reason
     };
 
     $http.post(BASE_URL+'/editor', $json_post).then(function(response) {
-
+      console.log(response);
+      //$state.go('tab.inicio');
     }, function(error) {
-
-    });*/
-    $state.go('tab.inicio');
+      console.log(error);
+    });
+    
   };
 });
