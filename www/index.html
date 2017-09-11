@@ -24,10 +24,16 @@
     -->
 
     <!-- ionic/angularjs js -->
+    <script src="lib/jquery/dist/jquery.min.js"></script>
+
     <script src="lib/ionic/js/ionic.bundle.js"></script>
 
     <script src="lib/angular/angular-md5.js"></script>
+
     <script src="lib/angular/taggedInfiniteScroll.js"></script>
+    
+    <script src="lib/ngInfiniteScroll/build/ng-infinite-scroll.min.js"></script>
+
     <script src="lib/moment/moment.js"></script>
     <script src="lib/moment/locale/es.js"></script>
     <script src="lib/angular-moment/angular-moment.js"></script>
@@ -67,18 +73,24 @@
 
       </ion-side-menu-content>
 
-      <ion-side-menu side="left">
+      <ion-side-menu side="left" width="300">
 
         <ion-content>
-          <div class="sidemenu-perfil">
+          <div class="sidemenu-perfil custom-secondary">
             <img src="{{myData.image}}" alt="">
             <h3>{{myData.username}} <i class="icon ion-locked" ng-hide="myData.public=='true'"></i></h3>
             <p>{{myData.name}}</p>
           </div>
           <ion-list>
             <ion-item class="item-icon-left" menu-toggle ui-sref="perfil({id: myData.id})"><i class="icon ion-android-person"></i>Mi perfil</ion-item>
-            <ion-item class="item-icon-left" menu-toggle ng-hide="myData.public=='true'" ui-sref="lista({id: myData.id, caso: 'peticiones'})"><i class="icon ion-android-person-add"></i>Solicitudes de seguimiento</ion-item>
-            <ion-item class="item-icon-left" menu-toggle href="#/config"><i class="icon ion-android-settings"></i>Configuración</ion-item>
+            <ion-item class="item-icon-left" menu-toggle ng-hide="myData.public=='true'" ui-sref="lista({id: myData.id, caso: 'peticiones'})">
+            <i class="icon ion-android-person-add"></i>
+            Solicitudes de seguimiento 
+            <span class="badge badge-positive" ng-if="req!=0">{{req}}</span></ion-item>
+            <ion-item class="item-icon-left" menu-toggle href="#/config">
+              <i class="icon ion-android-settings"></i>
+              Configuración
+            </ion-item>
             <ion-item class="item-icon-left" menu-toggle href="#/editor" ng-hide="myData.role=='editor'"><i class="icon ion-email"></i>Hacerme editor</ion-item>
           </ion-list>
         </ion-content>

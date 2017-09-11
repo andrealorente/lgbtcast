@@ -3,19 +3,19 @@
     <button class="button button-icon icon ion-android-more-vertical" ng-click="popover.show()"></button>
   </ion-nav-buttons>
   <ion-content padding="true" ng-init="cargarEvento()">
+    
+    <h2 style="color: rgb(0, 0, 0);">{{evento.title}}</h2>
     <div>
-      <img src="https://s3.amazonaws.com/ionic-io-static/9zr7aST8QmKTZ60SJAYS_ed87f5e227d2c5adfc9cb0fd62349300.jpg" style="display: block; width: 100%; height: auto; margin-left: auto; margin-right: auto;">
+      <img src="{{evento.image}}" style="display: block; width: 100%; height: auto; margin-left: auto; margin-right: auto;">
     </div>
     <div class="list">
        <ion-item class="item-icon-left"><i class="icon ion-location"></i>{{evento.place}}</ion-item>
        <ion-item class="item-icon-left">
         <i class="icon ion-calendar"></i>
         <span>{{evento.start_time | amDateFormat:'D MMMM YYYY, HH:mm'}}</span>
-        <span> - {{evento.end_time | amDateFormat:'D MMMM YYYY, HH:mm'}}</span>
+        <span ng-if="evento.end_time!=null"> - {{evento.end_time | amDateFormat:'D MMMM YYYY, HH:mm'}}</span>
         </ion-item>
     </div>
-    <h1 style="color: rgb(0, 0, 0);">{{evento.title}}</h1>
-
     <div class="show-list-numbers-and-dots">
       <p style="color:#000000;">
         {{evento.description}}
@@ -29,7 +29,7 @@
       {{evento.assistants.length}} asistirán</button>
     </div>
     <ion-list>
-      <h3>Comentarios</h3>
+      <h3>Comentarios({{evento.comments.length}})</h3>
       <div class="item item-input-inset">
         <label class="item-input-wrapper">
           <input type="text" placeholder="Escribe un comentario" ng-model="com.texto">
@@ -47,7 +47,7 @@
     </ion-list>
   </ion-content>
   <ion-footer-bar class="bar-positive">
-    <div class="button-bar">
+    <div class="button-bar event-bar">
     <a class="button button-positive icon-left ion-heart" ng-click="asistir(2)">Me interesa</a>
     <a class="button button-positive icon-left ion-checkmark" ng-click="asistir(1)">Asistir</a>
   </div>

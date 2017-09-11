@@ -5,12 +5,20 @@
       {{mes}} {{anyo}}
       <i class="icon ion-chevron-right" ng-click="cambiarMes(true)"></i>
     </h2>
+
+    <h3 ng-show="sineventos" class="empty-message">No hay ningún evento programado este mes</h3>
     <ion-list>
-      <ion-item class="item-thumbnail-left" ng-repeat="ev in eventos" ui-sref="tab.evento({id: ev.id})">
-        <img>
-        <h2>{{ev.title}}</h2>
-        <p style="white-space:normal;">{{ev.description}}</p>
-      </ion-item>
+      <div ng-repeat="ev in eventos" style="margin-top: 20px;">
+        <span style="font-weight: bold; color: #FF4081; margin-left: 9px;">{{ev.start_time | amCalendar:referenceTime:formats}}</span>
+        <ion-item class="item-thumbnail-left" ui-sref="tab.evento({id: ev.id})">
+          <img src="{{ev.image}}">
+          <h2 style="font-weight: bold;">{{ev.title}}</h2>
+          <p style="white-space:normal;">{{ev.description}}</p>
+        </ion-item>
+      </div>
+      
     </ion-list>
+
+    <ion-infinite-scroll ng-if="!desactivar" on-infinite="cargarEventos()" distance="10%"></ion-infinite-scroll>
   </ion-content>
 </ion-view>

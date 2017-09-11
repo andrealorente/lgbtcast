@@ -4,10 +4,10 @@
   </ion-nav-buttons>
   <ion-content padding="false" class="has-header" style="background: #c9cdd1;" ng-init="cargarCanal()">
 
-    <div class="channel-info">
+    <div class="channel-info custom-light">
       <h3>{{canal.title}}</h3>
-      <p>{{canal.description}}</p>
-      <a ui-sref="tab.susc({id: canal.id})"><small>{{canal.susc.length}} suscriptores</small></a>
+      <span style="color: white;">{{canal.description}}</span>
+      <p style="text-align: center;"><a ui-sref="tab.susc({id: canal.id})" style="color: white;"><small>{{canal.susc.length}} suscriptores</small></a></p>
     </div>
     <div class="channel-content list">
       <div class="message" ng-repeat="msg in canal.messages">
@@ -19,7 +19,7 @@
     </div>
     
   </ion-content>
-  <ion-footer-bar class="bar-positive custom-positive" align-title = "center" ng-click="suscCanal()">
+  <ion-footer-bar class="bar-positive custom-light" align-title = "center" ng-click="suscCanal()">
     <h1 class="title">{{suscBtn}}</h1>
   </ion-footer-bar>
 </ion-view>

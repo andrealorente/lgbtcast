@@ -1,24 +1,25 @@
 
-  <ion-view title="Login" hide-nav-bar="true" style="background-color: rgb(209, 39, 246);" cache-view="false">
+  <ion-view title="Login" hide-nav-bar="true" style="background-color: #9c27b0" cache-view="false">
   <ion-content padding="true" style="background-size:cover;" class="manual-ios-statusbar-padding" scroll="false">
     <form class="list">
-    <img src="img/logo1.png" width="100px" style="text-align: center;" />
-      <h3 style="color: #FFF; font-weight: 400; text-align: center;">Únete a la comunidad LGBT con LGBTcast</h3>
-
-        <label class="item-floating-label"">
-        <span class="input-label">Nombre de usuario o email</span>
+    <div style="text-align: center;">
+      <img src="img/logo1.png" width="100px" style="text-align: center; margin-top:10px;" />
+      <h3 style="color: #FFF; font-weight: 400; padding-left: 20px; padding-right: 20px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.68);">Únete a la comunidad LGBT con LGBTcast</h3>
+    </div>
+        <label class="item-floating-label">
+        <span class="input-label" style="color: white;">Nombre de usuario o email</span>
           <input placeholder="Nombre de usuario o email" type="text" ng-model="user.username" class="login-input">
         </label>
-        <label class="item-floating-label"">
-        <span class="input-label">Contraseña</span>
+        <label class="item-floating-label">
+        <span class="input-label" style="color: white;">Contraseña</span>
           <input placeholder="Contraseña" type="password" ng-model="user.password" class="login-input">
         </label>
-
-      <div class="spacer" style="height: 40px;"></div>
+      <a ng-click="enviar(user)" class="button button-positive button-clear" style="color: white; text-decoration: underline;">¿Has olvidado tu contraseña?</a>
+      <div class="spacer" style="height: 15px;"></div>
       <a ng-click="enviar(user)" class="button button-stable button-block login-button">Entrar</a>
-      <a ng-click="loginFacebook()" class="button button-stable button-block">Entrar con Facebook</a>
-      <a ng-click="loginGoogle()" class="button button-stable button-block">Entrar con Google</a>
-      <a ui-sref="registro()" class="button button-positive button-block button-clear">O crea una cuenta</a>
+      <a ng-click="loginFacebook()" class="button button-stable button-block social-button-facebook" style="background: #4267B2; color: white;">Entrar con Facebook</a>
+      <a ng-click="loginGoogle()" class="button button-stable button-block" style="background: #D4453F; color: white;">Entrar con Google</a>
+      <a ui-sref="registro()" class="button button-positive button-block button-clear" style="color: white;">O crea una cuenta</a>
     </form>
   </ion-content>
 </ion-view>

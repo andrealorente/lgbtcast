@@ -1,15 +1,13 @@
 
 <ion-view title="Configuración">
-  <ion-content padding="false" class="has-header">
+  <ion-content padding="false" class="has-header" style="top: 56px!important;">
     <ion-list>
       <ion-item ui-sref="cambiarpswd">Cambiar contraseña</ion-item>
       <ion-item ui-sref="privacidad">Privacidad</ion-item>
       <ion-item ng-click="cerrarSesion()">Cerrar sesión</ion-item>
-      <ion-item>Modo Alto Contraste</ion-item>
-      <ion-item ui-sref="tamfuente">Tamaño de letra</ion-item>
       <ion-item ui-sref="sobreapp">Sobre la aplicación</ion-item>
       <ion-item ui-sref="politica">Política de privacidad</ion-item>
-      <ion-item ui-sref="politica">Eliminar mi cuenta</ion-item>
+      <ion-item ng-click="eliminarCuenta()">Eliminar mi cuenta</ion-item>
     </ion-list>
   </ion-content>
 </ion-view>

@@ -1,21 +1,30 @@
-<ion-view title="Registro" hide-nav-bar="true" style="">
-  <ion-content padding="true" style="background: url(https://s3.amazonaws.com/ionic-io-static/rbb94lRTPyRDeqJYBjEZ_e870c4db344ae9e5ac5d8d2c5488d5b1.jpg) no-repeat center;background-size:cover;" class="manual-ios-statusbar-padding" scroll="false">
+<ion-view title="Registro" hide-nav-bar="true" style="background-color: #9c27b0;">
+  <ion-content padding="true" style="background-size:cover;" class="manual-ios-statusbar-padding" scroll="false">
     <form class="list">
+    <div style="text-align: center;">
+      <img src="img/logo1.png" width="100px" style="text-align: center; margin-top:10px;" />
+      <h3 style="color: #FFF; font-weight: 400; padding-left: 20px; padding-right: 20px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.68);">Únete a la comunidad LGBT con LGBTcast</h3>
+    </div>
       <ion-list>
-        <label class="item item-input">
-          <input placeholder="Nombre de usuario" type="text" ng-model="user.username">
+        <label class="item-floating-label">
+        <span class="input-label" style="color: white;">Nombre de usuario</span>
+          <input placeholder="Nombre de usuario" type="text" ng-model="user.username" class="login-input">
         </label>
-        <label class="item item-input">
-          <input placeholder="Email" type="email" ng-model="user.email">
+        <label class="item-floating-label">
+        <span class="input-label" style="color: white;">Correo</span>
+          <input placeholder="Email" type="email" ng-model="user.email" class="login-input">
         </label>
-        <label class="item item-input">
-          <input placeholder="Contraseña" type="password" ng-model="user.password">
+        <label class="item-floating-label">
+        <span class="input-label" style="color: white;">Contraseña</span>
+          <input placeholder="Contraseña" type="password" ng-model="user.password" class="login-input">
         </label>
-        <label class="item item-input">
-          <input placeholder="Repetir contraseña" type="password" ng-model="user.password2">
+        <label class="item-floating-label">
+        <span class="input-label" style="color: white;">Repetir contraseña</span>
+          <input placeholder="Repetir contraseña" type="password" ng-model="user.password2" class="login-input">
         </label>
       </ion-list>
-      <a ng-submit="enviar()" class="button button-stable button-block">Registrarse</a>
+      <div class="spacer" style="height: 40px;"></div>
+      <a ng-click="enviar(user)" class="button button-stable button-block login-button">Registrarse</a>
     </form>
   </ion-content>
 </ion-view>

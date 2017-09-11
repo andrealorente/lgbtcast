@@ -2,36 +2,36 @@
 <ion-nav-buttons side="right" class="has-header">
     <button class="button button-icon icon ion-android-send" ng-click="enviarSolicitud(user)"></button>
   </ion-nav-buttons>
-  <ion-content padding="true">
+  <ion-content padding="true"  style="top: 56px!important;">
   <div>
   	<h3>¿Quieres formar parte de la comunidad de LGBTcast y aportar contenidos a la aplicación?</h3>
   	<p>Rellena el formulario siguiente y nos pondremos en contacto contigo a través del 
-  	correo electrónico que nos proporciones.</p>
+  	correo electrónico que tengas asociado a esta cuenta.</p>
     <form action="">
 
-		   <label class = "item-floating-label">
+		   <!--label class = "item-floating-label">
 		      <span class = "input-label">Correo</span>
-		      <input type = "text" placeholder = "Correo" ng-model="user.email" />
-		   </label>
+		      <input type = "text" placeholder = "Correo" ng-model="user.email" style="border-bottom: 1px solid #DDD; margin-bottom: 10px;" />
+		   </label-->
 
 		   <label class = "item-floating-label">
 		      <span class = "input-label">Nombre y apellidos</span>
-		      <input type = "text" placeholder = "Nombre y apellidos" ng-model="user.name" />
+		      <input type = "text" placeholder = "Nombre y apellidos" ng-model="user.name" style="border-bottom: 1px solid #DDD; margin-bottom: 10px;" />
 		   </label>
 
 		   <label class = "item-floating-label">
 		      <span class = "input-label">Organización o colectivo</span>
-		      <input type = "text" placeholder = "Nombre de la organización o colectivo" ng-model="user.org" />
+		      <input type = "text" placeholder = "Nombre de la organización o colectivo" ng-model="user.org" style="border-bottom: 1px solid #DDD; margin-bottom: 10px;" />
 		   </label>
 
 		   <label class = "item-floating-label">
 		      <span class = "input-label">Motivo</span>
-		      <input type = "text" placeholder = "Motivo(s) para unirte a LGBTcast como editor" style="border-bottom: 1px solid #DDD;" ng-model="user.reason" />
+		      <input type = "text" placeholder = "Motivo(s) para unirte a LGBTcast como editor" style="border-bottom: 1px solid #DDD; margin-bottom: 10px;" ng-model="user.reason" />
 		   </label>
 
     </form>
     </div>
-    <div>
+    <div ng-hide="true">
     	<h3>Gracias por tu solicitud de editor</h3>
     	<p>Cuando procesemos tu solicitud para ser editor de LGBTcast se te avisará con un correo.</p>
     </div>

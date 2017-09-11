@@ -5,26 +5,26 @@
       <ion-slide-page style="">
         <img id="profile-image" src="{{usuario.image}}">
         <h4 id="profile-name">{{usuario.username}} <i class="icon ion-locked" ng-hide="usuario.public"></i></h4>
-        <h5>{{usuario.name}}</h5>
+        <h5 id="profile-name">{{usuario.name}}</h5>
         <span id="profile-description">{{usuario.bio}}</span>
-        <span>Lugar: {{usuario.place}}</span>
-        <span>Género: {{usuario.gender}}</span>
-        <span>Hola</span>
-        <button class="button button-positive button-block" ng-click="seguirUsuario()" ng-hide="soyYo(usuario.id)">{{botonMsg}}</button>
+        <p><span id="profile-place">{{usuario.place}}</span></p>
       </ion-slide-page>
       <ion-slide-page style="">
         
       </ion-slide-page>
     </ion-slides>
 
-    <button style="margin: 0px!important;" class="button button-positive button-block icon-right ion-edit custom-positive" ng-show="soyYo(usuario.id)" ui-sref="editar">Editar perfil</button>
+    <button style="margin: 0px!important; background-color: #d05ce3!important; border-radius: 0;" class="button button-positive button-block icon-right ion-edit" ng-show="soyYo(usuario.id)" ui-sref="editar">Editar perfil</button>
+
+    <button class="button button-positive button-block custom-light" style="margin: 0px!important; background-color: #d05ce3!important; border-radius: 0;" ng-click="seguirUsuario()" ng-hide="soyYo(usuario.id)">{{botonMsg}}</button>
+
     <div class="button-bar">
-      <button class="button button-positive button-block button-outline" ui-sref="lista({id: usuario.id, caso: 'seguidores'})">{{usuario.counts.followedby}} seguidor</button>
+      <button class="button button-positive button-block button-outline" ui-sref="lista({id: usuario.id, caso: 'seguidores'})">{{usuario.counts.followedby}} seguidores</button>
       <button class="button button-positive button-block button-outline" ui-sref="lista({id: usuario.id, caso: 'siguiendo'})">{{usuario.counts.following}} siguiendo</button>
     </div>
 
     <!--Actividad -->
-    <ion-list ng-if="mostrarAct">
+    <ion-list ng-show="mostrarAct">
       <ion-item class="item-avatar" ng-repeat="act in usuario.activity | orderBy: '-created_time'">
        <img src="{{usuario.image}}">
        <h2>
@@ -33,10 +33,10 @@
       </h2>
       <p style="white-space:normal;">
         {{act.action}}
-        <a ng-if="act.type==1" ui-sref="tab.publicacion({id: act.target_id})">publicación</a>
-        <a ng-if="act.type==2" ui-sref="tab.evento({id: act.target_id})">evento</a>
-        <a ng-if="act.type==3" ui-sref="perfil({id: act.target_id})">usuario</a>
-        <a ng-if="act.type==4" ui-sref="tab.canal({id: act.target_id})">canal</a>
+        <a class="custom-link" ng-if="act.type==1" ui-sref="tab.publicacion({id: act.target_id})">publicación</a>
+        <a class="custom-link" ng-if="act.type==2" ui-sref="tab.evento({id: act.target_id})">evento</a>
+        <a class="custom-link" ng-if="act.type==3" ui-sref="perfil({id: act.target_id})">usuario</a>
+        <a class="custom-link" ng-if="act.type==4" ui-sref="tab.canal({id: act.target_id})">canal</a>
       </p>
     </ion-item>
 

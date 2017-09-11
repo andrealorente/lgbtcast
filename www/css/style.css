@@ -3,24 +3,76 @@
 /* PRIMARY COLOR: #9c27b0; */
 /* ACCENT COLOR: ; #ff4081*/
 
+p {
+  font-size: 16px;
+  line-height: 1.5;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.custom-link {
+  color: #ff4081!important;
+  font-weight: bold!important;
+  text-decoration: none!important;
+}
+
+.custom-secondary {
+  background: #ff4081!important;
+}
+
 .custom-positive{
     
-    background-color: #9c27b0!important;
+    /*background-color: #9c27b0!important;*/
+    background-color: #6a0080!important;
     border:0;
  }
+
+ .custom-light {
+  background-color: #d05ce3!important;
+  border:0;
+ }
+
+/*Toolbar*/
+.bar {
+  height: 56px!important;
+}
+
+.bar .title {
+  height: 100%!important;
+line-height: 56px!important;
+}
+
+ /* Menu lateral */
+ .item-icon-left .icon {
+    left: 11px;
+    color: grey;
+    font-size: x-large;
+  }
 
 .tab-nav, .tabs {
   background-color: #9c27b0!important;
   color: white;
 }
 
+.has-tabs-top {
+  top: 105px;
+}
+
 .tab-item.tab-item-active, .tab-item.active, .tab-item.activated {
     color: white !important;
   }
 
+.tabs-top > .tabs, .tabs.tabs-top {
+    top: 56px!important;
+  }
+
 .sidemenu-perfil {
   padding: 20px;
-  background: #51d0d5;
+  color: white!important;
+}
+
+.sidemenu-perfil h3 {
+  color: white!important;
 }
 
 .sidemenu-perfil img{
@@ -37,7 +89,7 @@
 #profile-info {
   height: 220px;
   padding: 20px;
-  background: #51d0d5;
+  background: #9c27b0;
 
   color: #fff!important ;
 }
@@ -51,7 +103,11 @@
     margin-right: 10%;
 }
 
-#profile-info h3 {
+#profile-name {
+  color: white!important;
+}
+
+#profile-info h4 {
   font-weight: bold;
 }
 
@@ -60,6 +116,10 @@
 float: right;
 top: -5px;
 
+}
+
+.swiper-pagination-bullet {
+  background: white;
 }
 
 /** CANAL **/
@@ -86,20 +146,24 @@ top: -5px;
   margin-left: -10px; }
 
 .channel-info {
-  padding: 10px;
+  padding: 20px;
   text-align: center;
-  background: #1de9b6;
+  background: #9c27b0;
   position: fixed;
   z-index: 1000;
   width: 100%;
   box-shadow: 0.3px 0px 5px 3px #AEABAB;
 }
 
+.channel-info h3 {
+  color: white!important;
+}
+
 .channel-content {
   background-color: #c9cdd1;
   padding: 10px 0px 10px 10px;
   height: 500px;
-  padding-top: 120px;
+  padding-top: 150px;
 }
 
 .message-bubble small{
@@ -134,7 +198,52 @@ input {
 }
 
 .login-button {
-  background: #4d088d!important;
+  background: #6a0080!important;
   color: #FFF!important;
   border-radius: 20px;
 }
+
+.item-avatar h2{
+  font-weight: bold!important;
+}
+
+.item-tags span {
+  color: #FF4081;
+}
+
+.post-content {
+  padding: 20px;
+  line-height: 1.5;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.inicio-title {
+  font-weight: bold;
+  color: black!important;
+}
+
+.toggle.toggle-calm input:checked + .track {
+background-color: #FF4081;
+border-color: #FF4081;
+}
+
+.empty-message {
+  color: grey;
+text-align: center;
+margin-top: 160px;
+}
+
+.swiper-container-horizontal > .swiper-pagination {
+  display: none;
+}
+
+/*.bar.bar-positive.bar-footer {
+  background: #FF4081;
+  border: #FF4081;
+}
+
+.event-bar > .button:first-child, .button:last-child {
+  background: #FF4081;
+  border: #FF4081;
+}*/

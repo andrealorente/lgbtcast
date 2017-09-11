@@ -1,4 +1,7 @@
 <ion-view title="Publicación" ng-init="cargarPost()" cache-view="true">
+<ion-nav-buttons side="right" class="has-header">
+    <button class="button button-icon icon ion-android-more-vertical" ng-click="popover.show($event)"></button>
+  </ion-nav-buttons>
   <ion-content padding="false" class="has-header" ng-hide="post==undefined">
     <ion-list>
       <ion-item class="item-avatar" style="">
@@ -10,25 +13,27 @@
     <div>
       <img ng-if="post.image!=null" ng-src="http://res.cloudinary.com/tfg-lgbt-cloud/image/upload/v{{post.image}}.jpg" style="display: block; width: 100%; height: auto; margin-left: auto; margin-right: auto;">
     </div>
-    <h1 style="color: rgb(0, 0, 0);">{{post.title}}</h1>
+    <div class="post-content">
+    <h2 style="color: rgb(0, 0, 0);">{{post.title}}</h2>
     <div class="show-list-numbers-and-dots">
-      <p style="color:#000000;">
-        {{post.content}}
+      <p style="color:#000000;" ng-bind-html="post.content">
       </p>
     </div>
-    <div class="item">
-      <strong>Etiquetas: </strong><p><span ng-repeat="tag in post.tags">#{{tag}} </span></p>
+    <strong>Etiquetas: </strong><p><span ng-repeat="tag in post.tags">#{{tag}} </span></p>
     </div>
+ 
+      
+
     
     <div class="item">
       <i class="icon ion-ios-heart-outline" ng-click="likePost()" style="font-size: x-large;" ng-if="liked==false"></i>
       <i class="icon ion-ios-heart" ng-click="likePost()" style="font-size: x-large; color: #e72a4b;" ng-show="liked"></i>
 
-      <a ui-sref="tab.likes({id: post.id})"> {{post.likes.length}} me gusta</a>
+      <a ui-sref="tab.likes({id: post.id})" style="color: black; font-weight: bold; text-decoration: none;"> {{post.likes.length}} me gusta</a>
     </div>
 
     <ion-list>
-    <h3>Comentarios ({{post.comments.length}})</h3>
+    <h3 style="padding-left: 20px; padding-top: 10px;">Comentarios ({{post.comments.length}})</h3>
       <div class="item item-input-inset">
         <label class="item-input-wrapper">
           <input type="text" placeholder="Escribe un comentario" ng-model="com.texto">
@@ -38,9 +43,12 @@
         </button>
       </div>
 
-      <ion-item class="item-avatar item-icon-right" style="" ng-repeat="comment in post.comments | orderBy: 'created_time'">
+      <ion-item class="item-avatar item-icon-right" style="" ng-repeat="comment in post.comments | orderBy: '-created_time'">
         <img src="{{comment.author_data.image}}">
-        <h2 ui-sref="perfil({id: comment.author_id})">{{comment.author_data.username}} <small style="font-size: 80%; color: #BDBCBC;" am-time-ago="comment.created_time"></small></h2>
+        <h2 ui-sref="perfil({id: comment.author_id})">
+          {{comment.author_data.username}}
+          <small style="font-size: 80%; color: #BDBCBC;" am-time-ago="comment.created_time"></small>
+        </h2>
         <p style="white-space:normal;">{{comment.content}}</p>
         <i class = "icon ion-android-alert" style="color: #D4D4D4; font-size: x-large;" ng-if="comment.author_id!=myData.id" ui-sref="reportar({tipo: 'comentario', id: comment.id})"></i>
       </ion-item>

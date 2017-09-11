@@ -1,7 +1,7 @@
 <ion-view title="Inicio" cache-view="true">
   <ion-content>
   <ion-refresher on-refresh="refrescarPosts()"></ion-refresher>
-    <div class="list" tagged-infinite-scroll="cargarPosts()">
+    <div class="list">
 
       <div class="list card" ng-repeat="post in posts">
         <div class="item item-avatar">
@@ -11,16 +11,18 @@
         </div>
         <div class="item item-body" ui-sref="tab.publicacion({id: post.id})">
           <img class="full-image" ng-if="post.image!=null" ng-src="http://res.cloudinary.com/tfg-lgbt-cloud/image/upload/v{{post.image}}.jpg">
-          <p>{{post.title}}</p>
+          <p class="inicio-title">{{post.title}}</p>
           <p>
             <a href="#" class="subdued"><i class="icon ion-ios-heart"></i> {{post.likes.length}} me gusta</a>
-            <a href="#" class="subdued">5 comentarios</a>
+            <a href="#" class="subdued">{{post.comments_count}} comentarios</a>
           </p>
         </div>
-        <div class="item item-divider">
+        <div class="item item-divider item-tags">
           <span ng-repeat="tag in post.tags">#{{tag}} </span>
         </div>
     </div>
   </div>
+
+  <ion-infinite-scroll ng-if="!desactivar" on-infinite="cargarPosts()" distance="10%"></ion-infinite-scroll>
   </ion-content>
 </ion-view>

@@ -1,19 +1,22 @@
 <ion-view title="Actividad">
   <ion-content>
-    <ion-list tagged-infinite-scroll="cargarActiv()" tagged-infinite-scroll-disabled="consultar || desactivar">
+
+    <ion-list>
       <ion-item class="item-avatar" ng-repeat="act in actividad">
          <img src="{{act.origin_data.image}}">
          <h2 ui-sref="perfil({id: act.origin_id})">{{act.origin_data.username}}
           <small style="font-size: 80%; color: #BDBCBC;" am-time-ago="act.created_time"></small>
          </h2>
          <p style="white-space:normal;">
-         	{{act.action}} un
-         	<a ng-if="act.type==1" ui-sref="tab.publicacion({id: act.target_id})">publicación</a>
-         	<a ng-if="act.type==2" ui-sref="tab.evento({id: act.target_id})">evento</a>
-          <a ng-if="act.type==3" ui-sref="tab.perfil({id: act.target_id})">usuario</a>
-         	<a ng-if="act.type==4" ui-sref="tab.canal({id: act.target_id})">canal</a>
+         	{{act.action}} 
+         	<a class="custom-link" ng-if="act.type==1" ui-sref="tab.publicacion({id: act.target_id})">publicación</a>
+         	<a class="custom-link" ng-if="act.type==2" ui-sref="tab.evento({id: act.target_id})">evento</a>
+          <a class="custom-link" ng-if="act.type==3" ui-sref="tab.perfil({id: act.target_id})">usuario</a>
+         	<a class="custom-link" ng-if="act.type==4" ui-sref="tab.canal({id: act.target_id})">canal</a>
          </p>
        </ion-item>
     </ion-list>
+    <ion-infinite-scroll ng-if="!desactivar" on-infinite="cargarActiv()" distance="10%"></ion-infinite-scroll>
+    <h3 class="empty-message" ng-if="actividad.length==0">No hay actividad que mostrar</h3>
   </ion-content>
 </ion-view>

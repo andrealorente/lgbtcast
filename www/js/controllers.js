@@ -1,4 +1,4 @@
-angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScroll', 'btford.socket-io'])
+angular.module('app.controllers', ['angular-md5','infinite-scroll', 'btford.socket-io'])
 
 .factory('socket',function(socketFactory){
   var myIoSocket = io.connect('https://lgbt-api.herokuapp.com');
@@ -22,8 +22,8 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   }
 })
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout, socket, ContadorMsg) {
-
+.controller('AppCtrl', function($scope, $ionicModal, $timeout, socket, ContadorMsg, $http) {
+  $scope.req = 0;
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
   // To listen for when this page is active (for example, to refresh data),
@@ -56,6 +56,15 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
       });
       }
     }, 1000);
+
+    if(localStorage.getItem("user_public") == "false"){
+      console.log("Hola");
+      $http.get(BASE_URL+'/requests').then(function(res) {
+        $scope.req = res.data.data.length;
+      }, function(error) {
+        console.log(error);
+      });
+    }
 
   });
   $scope.$on('$ionicView.beforeEnter', function (event, viewData) {
@@ -147,7 +156,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
 
             FCMPlugin.getToken(function(token) {
               // save this server-side and use it to push notifications to this device
-              alert(token);
+           
               $json_post2 = { firebase_token: token };
               console.log(token);
               $http.post(BASE_URL+ '/firebase',$json_post2).then(function(response){
@@ -234,7 +243,20 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
         };
 
         $http.post(BASE_URL+'/users/login/google').then(function(response){
-          console.log(response);
+          if(response.data.success){
+          //LocalStorage de Cordova
+          localStorage.setItem("user_id", res.data.data.id);
+          localStorage.setItem("user_username", res.data.data.username);
+          localStorage.setItem("user_token", res.data.token);
+          localStorage.setItem("user_public", res.data.data.public);
+          localStorage.setItem("user_image", res.data.data.image);
+          localStorage.setItem("user_role", res.data.data.role);
+          
+          $state.go('tab.inicio');
+        }else{
+          window.plugins.toast.showLongBottom(res.data.error.message, function(a){
+            console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        }
         }, function(error){
           console.log(error);
         });
@@ -249,7 +271,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   } //Fin else
 })
 
-.controller('regCtrl', function($scope,$http,md5) {
+.controller('regCtrl', function($scope,$http,md5,$state, $ionicPopup) {
   $scope.user = {};
   $scope.enviar = function() {
     if ($scope.user.username == null || $scope.user.password == null || $scope.user.password2 == null || $scope.user.email == null) {
@@ -272,8 +294,19 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
             console.log("Registro correcto");
             console.log(response);
 
-            //Redirigir a main.home
-            $state.go('login');
+            //PONER UN ALERT BONICO DICIENDO QUE SE HA ENVIADO UN CORREO PARA CONFIRMAR CUENTA
+
+             var alertPopup = $ionicPopup.alert({
+               title: 'Registro correcto',
+               template: 'Te hemos enviado un correo para confirmar tu cuenta.'
+             });
+             alertPopup.then(function(res) {
+              if(res)
+                $state.go('login');
+               
+             });
+            
+            
           } else {
             console.log("Registro incorrecto.");
             console.log(response);
@@ -290,7 +323,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   };
 })
 
-.controller('inicioCtrl', function($scope, $http,$ionicSideMenuDelegate, $stateParams) {
+.controller('inicioCtrl', function($scope, $http,$ionicSideMenuDelegate, $stateParams,$ionicPopover) {
   $ionicSideMenuDelegate.canDragContent(true);
   $scope.last = new Date().toISOString();
   $scope.posts = [];
@@ -308,20 +341,33 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
 
       $http.get(BASE_URL+'/posts?after='+$scope.last).then(function(response){
           console.log(response);
-          if(response.data.data.length>0)
+          if(response.data.data!=undefined && response.data.data.length>0){
+            console.log("response.data.data.length es >0");
             $scope.posts = $scope.posts.concat(response.data.data);
-          else {
+            $scope.consultar = false;
+          } else if(response.data.success == false){
+            console.log("response.data.success es false y no quedan más");
+            $scope.consultar = false;
             $scope.desactivar = true;
+            
           }
+        $scope.$broadcast('scroll.infiniteScrollComplete');
+        
       }, function(error){
           //there was an error fetching from the server
           console.log(error);
       });
 
     }
+
+    if($scope.desactivar){
+      console.log("Desactivar es true");
+      $scope.$broadcast('scroll.infiniteScrollComplete');
+    }
   };
 
   $scope.refrescarPosts = function() {
+    $scope.desactivar = false;
     $scope.last = new Date().toISOString();
     $http.get(BASE_URL+'/posts?after='+$scope.last).then(function(response){
       console.log(response);
@@ -333,12 +379,11 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
       });
   };
 
-  $scope.cargarPosts();
-
   $scope.cargarPost = function() {
     $http.get(BASE_URL+'/posts/'+$stateParams.id).then(function(response){
       $scope.post = response.data.data;
       $scope.post.id = $stateParams.id;
+      $scope.object = {tipo: 'publicación', id: $stateParams.id};
 
       if($scope.post.likes.indexOf(localStorage.getItem("user_id"))==-1)
         $scope.liked = false;
@@ -348,6 +393,13 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
         console.log("Error: "+error);
     });
   };
+
+  $ionicPopover.fromTemplateUrl('templates/popover.html', {
+    scope: $scope,
+  }).then(function(popover) {
+    $scope.popover = popover;
+    console.log($scope);
+  });
 
   $scope.likePost = function() {
     $scope.liked = !$scope.liked;
@@ -402,27 +454,77 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   $scope.eventos = [];
   $scope.sineventos = false;
   $scope.com = {};
+  $scope.consultar = false;
+  $scope.desactivar = false; //Deshabilitar llamadas a la api si no hay más datos
 
   $scope.cargarEventos = function() {
+    console.log("Entro en cargarEventos");
     var hoy = new Date();
-    var url = '/events?month='+ hoy.getMonth() + '&year=' + hoy.getFullYear()+'&after='+ new Date();
-    $http.get(BASE_URL+url).then(function(response){
-      if(response.data.success == true){
-        //Comprobar si hay eventos el mes consultado
-        if(response.data.data.length==0)
-          $scope.sineventos = true;
-        else $scope.sineventos = false;
-        //Asignar los datos
-        $scope.mes = MESES[hoy.getMonth()];
-        $scope.anyo = hoy.getFullYear();
-        $scope.eventos = response.data.data;
-      }
-    }, function(error){
-      console.log("Error");
-    });
+    //Asignar los datos
+    if($scope.mes==0) //Si no hay un mes ya asignado obtener el actual
+      $scope.mes = MESES[hoy.getMonth()];
+
+    if($scope.anyo==0)//Lo mismo con el año
+      $scope.anyo = hoy.getFullYear();
+
+    //$scope.last = '2017-08-01T00:00:00.248Z';
+
+    var m = MESES.indexOf($scope.mes);
+    var mes2 = m;
+    if(m<10)
+      mes2 = '0'+m;
+
+    console.log("mes2: "+mes2);
+
+    if($scope.eventos.length>0) //Si ya hay eventos cargados
+      $scope.last = $scope.eventos[$scope.eventos.length-1].start_time;
+    else
+      $scope.last = $scope.anyo+'-'+mes2+'-01T00:00:00.000Z';
+
+    if(!$scope.consultar){
+      $scope.consultar = true;
+
+      var url = '/events?month='+ m + '&year=' + hoy.getFullYear()+'&after='+$scope.last;
+      console.log(url);
+
+      $http.get(BASE_URL+url).then(function(response){
+        if(response.data.success == true){
+          //Comprobar si hay eventos el mes consultado
+          
+          $scope.sineventos = false;
+
+          if($scope.eventos.length>0)  
+            $scope.eventos = $scope.eventos.concat(response.data.data);
+          else
+            $scope.eventos = response.data.data;
+          $scope.last = $scope.eventos[$scope.eventos.length-1].start_time;
+          $scope.consultar = false;
+   
+        }else{
+          if($scope.eventos.length==0)
+            $scope.sineventos = true;
+
+          $scope.consultar = true;
+          $scope.desactivar = true;
+        }
+
+        $scope.$broadcast('scroll.infiniteScrollComplete');
+      }, function(error){
+        console.log("Error");
+      });
+
+    }
   };
 
   $scope.cambiarMes = function(next) {
+    $scope.desactivar = false;
+    $scope.consultar = false;
+    $scope.sineventos = false;
+    $scope.eventos = [];
+
+    console.log("Entro en cambiarMes");
+    console.log("Scope.mes: "+ $scope.mes);
+
     var m = MESES.indexOf($scope.mes); //Si es febrero m = 1, hay que aumentar este valor
     if(next){
       if(m == 11){
@@ -443,22 +545,34 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
       }else m--;
     }
 
+    $scope.mes = MESES[m];
+    $scope.cargarEventos();
 
-    var url = '/events?month='+ m + '&year=' + $scope.anyo+'&after='+ new Date().toISOString();
-    $http.get(BASE_URL + url).then(function(response){
-      if (response.data.success == true) {
-        console.log("Events cargados");
-        console.log(response.data);
-        if(response.data.data.length == 0)
+    /*if(!$scope.consultar){
+      $scope.consultar = true;
+
+      var url = '/events?month='+ m + '&year=' + $scope.anyo+'&after=2017-'+mes2+'-01T00:00:00.248Z';
+      $http.get(BASE_URL + url).then(function(response){
+        if (response.data.success == true) {
+          console.log("Events cargados");
+          console.log(response.data);
+
+          $scope.mes = MESES[m];
+
+          $scope.eventos = $scope.eventos.concat(response.data.data);
+          $scope.sineventos = false;
+          $scope.consultar = false;
+        }else{
           $scope.sineventos = true;
-        else $scope.sineventos = false;
-
-        $scope.mes = MESES[m];
-        $scope.eventos = response.data.data;
-      }
-    },function(error){
-        console.log("Error: "+error);
-    });
+          $scope.desactivar = true;
+          $scope.mes = MESES[m];
+          $scope.eventos = [];
+        }
+        $scope.$broadcast('scroll.infiniteScrollComplete');
+      },function(error){
+          console.log("Error: "+error);
+      });
+    }*/
   };
 
   $scope.cargarEvento = function(){
@@ -543,7 +657,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
       content: msg,
       created_time: new Date().toISOString()
     });
-    $ionicScrollDelegate.scrollBottom(true);
+    console.log("LEROYYYYYYY YENKINS");
   });
 
   $scope.$on('$ionicView.beforeLeave', function() {
@@ -581,6 +695,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
         console.log(response.data.data);
         $scope.canal = response.data.data;
         $scope.canal.id = $stateParams.id;
+        $scope.object = { tipo: 'canal', id: $stateParams.id}; //Para el popover
         //Si estoy suscrita cambiar el mensaje del botón
         if($scope.canal.susc.indexOf(localStorage.user_id)==-1)
           $scope.suscBtn = "Suscribirme";
@@ -636,27 +751,6 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     
   };
 
-  $scope.notifCanal = function() {
-
-    $json_post = { user_id: localStorage.user_id };
-    var url = '/channels/' + $stateParams.id + '/notifications';
-    //Enviar post
-    $http.post(BASE_URL + url, $json_post).then(function(response){
-      console.log("Notificaciones modificadas correctamente");
-      //Mostrar el icono o no de silencio
-      //Hacer un suscribe o no del topic para mostrar (o no) las notificaciones
-      /*FCMPlugin.unsubscribeFromTopic($stateParams.id, function(msg){
-        console.log(msg);
-        alert(msg);
-      }, function(err){
-        console.log("Error suscribiéndome al topic de firebase");
-      });*/
-      console.log(response.data);
-    },function(error){
-      console.log(error);
-    });
-  };
-
   $scope.cargarLista = function() { //De suscriptores
     $scope.lista = [];
     $http.get(BASE_URL+'/channels/'+ $stateParams.id + '/suscribers').then(function(response){
@@ -698,6 +792,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     $http.get(BASE_URL+'/users/'+ localStorage.getItem("user_id")).then(function(response){
       $scope.datos = response.data.data;
       console.log($scope.datos);
+      $scope.image = $scope.datos.image;
     }, function(error){
       console.log(error);
     });
@@ -726,16 +821,19 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
             $scope.botonMsg = "Seguir";
             //Ver qué debe de poner en el botón de seguir
             if(response2.data.data.outgoing == "follows") $scope.botonMsg = "Siguiendo";
-            else if(response2.data.outgoing == "requested") $scope.botonMsg = "Solicitado";
-            else if(response2.data.outgoing == "none" && $scope.usuario.public==false) $scope.botonMsg = "Solicitar seguir";
+            else if(response2.data.data.outgoing == "requested") $scope.botonMsg = "Solicitado";
+            else if(response2.data.data.outgoing == "none" && $scope.usuario.public==false){
+              console.log("Hola");
+              $scope.botonMsg = "Solicitar seguir";
+            } 
 
             $ionicLoading.hide();
           }
         },function(error2){
           console.log("Eerrorrr");
         });
-      }
-      $scope.mostrarAct = true;
+      }else $scope.mostrarAct = true;
+
       $ionicLoading.hide();
     }, function(error){
       console.log(error);
@@ -757,6 +855,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     $http.get(BASE_URL+url).then(function(response){
       console.log(response);
       if($stateParams.caso != "peticiones" && response.data.data.length>0 && !$scope.soyYo($stateParams.id)){ //Si son seguidores/seguidos de otro usuario
+        $scope.botones = false;
         for(var i=0; i<response.data.data.length; i++){
           //Obtener la relación entre ese usuario y yo
           var url = BASE_URL + '/users/' + response.data.data[i].id + '/relationship';
@@ -790,6 +889,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
       }//Fin for
 
       }else if($stateParams.caso!="peticiones" && response.data.data.length>0 && $scope.soyYo($stateParams.id)){
+        $scope.botones = false;
         for(var i in response.data.data){
           //Ver qué debe de poner en el botón de seguir
           if(response.data.data[i].outgoing_status == "follows") botonMsg = "Siguiendo";
@@ -803,6 +903,8 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
             image: response.data.data[i].user_data.image,
             public: response.data.data[i].user_data.public,
           };
+
+
           $scope.lista.push({
             user: user,
             relwithme: botonMsg
@@ -810,6 +912,23 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
         }//Fin for
         console.log("Lista: ");
         console.log($scope.lista);
+
+      }else if($stateParams.caso=="peticiones"){
+        $scope.botones = true;
+        for(var i in response.data.data) {
+          var user = {
+            id: response.data.data[i].id,
+            username: response.data.data[i].user_data.username,
+            name: response.data.data[i].user_data.name,
+            image: response.data.data[i].user_data.image,
+            public: response.data.data[i].user_data.public,
+          };
+
+          $scope.lista.push({
+            user: user,
+            relwithme: botonMsg
+          });
+        }
       }
     },function(error){
       console.log("Error cargando la lista de usuarios.");
@@ -856,7 +975,8 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
 
   $scope.editarUsuario = function() {
 
-    var options = new FileUploadOptions();
+    if(localStorage.getItem("user_image") != $scope.image){ //Si se ha cambiado la imagen de perfil
+      var options = new FileUploadOptions();
     options.fileKey = "file";
     options.fileName = $scope.image.substr($scope.image.lastIndexOf('/') + 1);
     options.mimeType = "image/jpeg";
@@ -902,6 +1022,34 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
           console.log(error);
         });
       }, $scope.fail, options,true);
+    }else{
+      $json_post = {
+          user_username: $scope.datos.username,
+          user_name: $scope.datos.name,
+          user_bio: $scope.datos.bio,
+          user_email: $scope.datos.email,
+          user_gender: $scope.datos.gender,
+          user_place: $scope.datos.place,
+          user_image: $scope.datos.image
+        };
+
+        $http.post(BASE_URL+'/users/'+ localStorage.getItem("user_id"), $json_post).then(function(response){
+          $ionicLoading.show({template: 'Guardando datos...'});
+          console.log(response.data);
+          if(!response.data.success){
+            window.plugins.toast.showLongBottom(response.data.error.message, function(a){
+            console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+          }else{
+            $ionicLoading.hide();
+            $ionicHistory.goBack();
+          }
+
+
+        },function(error){  
+          console.log(error);
+        });
+    }
+    
     
   };
 
@@ -909,12 +1057,12 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     $ionicLoading.hide();
     console.log("Code = " + r.responseCode);
     console.log(r.response);
-    alert("Response = " + r.response);
+    //alert("Response = " + r.response);
     console.log("Sent = " + r.bytesSent);
   };
 
   $scope.fail = function (error) {
-      alert("An error has occurred: Code = " + error.code);
+      
       window.plugins.toast.showLongBottom('Ha habido un error, prueba de nuevo.', function(a){
             console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
   };
@@ -942,7 +1090,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   };
 
   $scope.onFail = function(message) {
-    alert('Failed because: ' + message);
+    
   };
 
   $scope.cargarImagen = function() {
@@ -968,12 +1116,15 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     if(!$scope.consultar){
       $scope.consultar = true;
       $http.get(url).then(function(response){
+        console.log("Hago el http.get");
         console.log(response);
         $scope.consultar = false;
         if(response.data.success){
-          if(response.data.data.length>0)
+          if(response.data.data.length>0){
             $scope.actividad = $scope.actividad.concat(response.data.data);
-          else {
+            if(response.data.data.length<10)
+              $scope.desactivar = true;
+          } else {
             $scope.desactivar = true;
           }
       }
@@ -1032,7 +1183,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
     }
 
     var type;
-    if($scope.type == "usuario") type = 1;
+    if($scope.type == "publicación") type = 1;
     else if($scope.type == "comentario") type = 2;
     else if($scope.type == "canal") type = 3;
     console.log($scope.type);
@@ -1068,7 +1219,7 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   };
 })
 
-.controller('configCtrl', function($scope, $stateParams,$state,$ionicHistory, md5, $http) {
+.controller('configCtrl', function($scope, $stateParams,$state,$ionicHistory, md5, $http, $ionicPopup) {
 
   $scope.fontSize = function() {
 
@@ -1116,13 +1267,49 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
   };
 
   $scope.cerrarSesion = function() {
-    localStorage.clear();
-    $ionicHistory.clearCache();
-    $state.go('login');
+    var confirmPopup = $ionicPopup.confirm({
+     title: 'Cerrar sesión',
+     template: '¿Estás seguro de que deseas cerrar sesión?',
+     buttons: [
+       { text: 'Cancelar' },
+       { text: '<b>Aceptar</b>',
+         type: 'button-positive',
+         onTap: function(e) {
+          localStorage.clear();
+          $ionicHistory.clearCache();
+          $state.go('login');
+         } }]
+   });
+  
+  };
+
+  $scope.eliminarCuenta = function() {
+    var confirmPopup = $ionicPopup.confirm({
+     title: 'Eliminar cuenta',
+     template: 'Si aceptas, se enviará una solicitud al administrador y en unos días tu cuenta será eliminada. ¿Estás seguro de que quieres eliminar tu cuenta de LGBTcast?',
+     buttons: [
+       { text: 'Cancelar' },
+       { text: '<b>Aceptar</b>',
+         type: 'button-positive',
+         onTap: function(e) {
+
+          //$http.post()
+          localStorage.clear();
+          $ionicHistory.clearCache();
+          $state.go('login');
+         } }]
+    });
   };
 
   //Solicitud de convertirse en editor
   $scope.enviarSolicitud = function() {
+
+    if($scope.user.name ==null || $scope.user.reason ==null){
+       window.plugins.toast.showLongBottom('Debes rellenar los campos obligatorios', function(a){
+        console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+       return;
+    }
+
     $json_post = {
       email: $scope.user.email,
       name: $scope.user.name,
@@ -1132,6 +1319,21 @@ angular.module('app.controllers', ['angular-md5','tagged.directives.infiniteScro
 
     $http.post(BASE_URL+'/editor', $json_post).then(function(response) {
       console.log(response);
+      if(response.data.success){
+        var alertPopup = $ionicPopup.alert({
+          title: 'Solicitud enviada',
+          template: 'Tu solicitud se ha enviado correctamente. En unos días recibirás un correo para notificarte del estado de tu solicitud.'
+        });
+        alertPopup.then(function(res) {
+          if(res)
+          $state.go('tab.inicio');
+
+        });
+      }else{
+         window.plugins.toast.showLongBottom(response.data.error.message, function(a){
+        console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+      }
+      
       //$state.go('tab.inicio');
     }, function(error) {
       console.log(error);

@@ -1,5 +1,5 @@
 <ion-view title="Lista"> <!-- seguidores, seguidos, likes, etc. -->
-  <ion-content ng-init="cargarLista()">
+  <ion-content ng-init="cargarLista()" style="padding-top: 12px!important;">
     <ion-list>
       <ion-item class="item item-avatar item-button-right" ng-repeat="item in lista">
         <img src="{{item.user.image}}">
@@ -8,6 +8,14 @@
           <i class="icon ion-locked" ng-hide="item.user.public"></i>
         </h2>
         <p style="white-space:normal;">{{item.user.name}}</p>
+        <div class="buttons" ng-show="botones" style="padding-top: 13px;">
+          <button class="button button-positive" ng-click="aceptarPeticion(true, item.user.id)">
+              <i class="icon ion-checkmark-round"></i>
+          </button>
+          <button class="button button-positive button-outline" ng-click="aceptarPeticion(false, item.user.id)">
+              <i class="icon ion-android-close"></i>
+          </button>
+        </div>
         <!--i class="icon ion-android-person-add"></i-->
         <!--button class="button button-stable button-block">Seguir</button-->
       </ion-item>
