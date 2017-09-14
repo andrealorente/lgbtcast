@@ -234,7 +234,7 @@ angular.module('app.controllers', ['angular-md5','infinite-scroll', 'btford.sock
         'offline': false, // optional, but requires the webClientId - if set to true the plugin will also return a serverAuthCode, which can be used to grant offline access to a non-Google server
       },
       function (obj) {
-        alert(JSON.stringify(obj)); // do something useful instead of alerting
+        //alert(JSON.stringify(obj)); // do something useful instead of alerting
         console.log(obj);
         $json_post = {
           email: obj.email, 
@@ -651,6 +651,9 @@ angular.module('app.controllers', ['angular-md5','infinite-scroll', 'btford.sock
   $scope.miscanales = [];
   $scope.canales = [];
   $scope.suscBtn = "Suscribirme";
+  $scope.desactivar = false;
+  $scope.consultar = false;
+  $scope.last = new Date().toISOString();
 
   socket.on('chat message', function(msg){ //Añadir los mensajes que te llegan
     $scope.canal.messages.push({
@@ -667,13 +670,35 @@ angular.module('app.controllers', ['angular-md5','infinite-scroll', 'btford.sock
   });
 
   $scope.cargarCanales = function() {
-    $http.get(BASE_URL+'/channels?after='+new Date().toISOString()).then(function(response){
-      if(response.data.success){
-        $scope.canales = response.data.data;
-      }
-    },function(error){
+    if($scope.canales.length>0)
+      $scope.last = $scope.canales[$scope.canales.length-1].created_time;
 
-    });
+    if(!$scope.consultar){
+      $scope.consultar = true;
+      $http.get(BASE_URL+'/channels?after='+$scope.last).then(function(response){
+        if(response.data.success){
+          console.log(response.data);
+          if($scope.canales.length>0)
+            $scope.canales.concat(response.data.data);
+          else{
+            $scope.canales = response.data.data;
+            if(response.data.data.length < 8){
+              $scope.desactivar = true;
+            }
+          } 
+
+
+        }else if(response.data.success == false){
+            console.log("response.data.success es false y no quedan más");
+            $scope.consultar = false;
+            $scope.desactivar = true;
+            
+        }
+        $scope.$broadcast('scroll.infiniteScrollComplete');
+      },function(error){
+
+      });
+    }
   };
 
   $scope.misCanales = function() {
@@ -726,7 +751,7 @@ angular.module('app.controllers', ['angular-md5','infinite-scroll', 'btford.sock
           //Suscribirme al topic del canal
           FCMPlugin.subscribeToTopic($stateParams.id, function(msg){
             console.log(msg);
-            alert(msg);
+            
           }, function(err){
             alert("Error");
             console.log("Error suscribiéndome al topic de firebase");
@@ -738,7 +763,7 @@ angular.module('app.controllers', ['angular-md5','infinite-scroll', 'btford.sock
           socket.emit('leave', 'canal');
           FCMPlugin.unsubscribeFromTopic($stateParams.id, function(msg){
             console.log(msg);
-            alert(msg);
+            
           }, function(err){
             console.log("Error suscribiéndome al topic de firebase");
           });
@@ -838,6 +863,10 @@ angular.module('app.controllers', ['angular-md5','infinite-scroll', 'btford.sock
     }, function(error){
       console.log(error);
     });
+  };
+
+  $scope.cargarMasActividad = function() {
+
   };
 
   $scope.cargarLista = function() {
@@ -1100,12 +1129,13 @@ angular.module('app.controllers', ['angular-md5','infinite-scroll', 'btford.sock
 
 })
 
-.controller('activCtrl', function($scope,$http){
+.controller('activCtrl', function($scope,$http, $ionicScrollDelegate){
   $scope.actividad = [];
   $scope.consultar = false;
   $scope.desactivar = false;
 
   $scope.cargarActiv = function(){
+    console.log("Entro en cargarActiv");
     if($scope.actividad.length==0)
       $scope.ultima = new Date().toISOString();
     else
@@ -1127,7 +1157,11 @@ angular.module('app.controllers', ['angular-md5','infinite-scroll', 'btford.sock
           } else {
             $scope.desactivar = true;
           }
+      }else{
+        $scope.desactivar = true;
+        $scope.consultar = true;
       }
+      $scope.$broadcast('scroll.infiniteScrollComplete');
     },function(error){
       console.log(error);
     });
@@ -1147,6 +1181,13 @@ angular.module('app.controllers', ['angular-md5','infinite-scroll', 'btford.sock
     $http.get(BASE_URL+'/search/users?text='+$scope.busqueda.texto).then(function(resultado){
       console.log(resultado.data);
       $scope.lista = resultado.data.data;
+    }, function(error){
+      console.log(error);
+    });
+
+    $http.get(BASE_URL+'/search/post?searchparams='+$scope.busqueda.texto).then(function(resultado) {
+      console.log(resultado.data);
+      $scope.posts = resultado.data.data;
     }, function(error){
       console.log(error);
     });

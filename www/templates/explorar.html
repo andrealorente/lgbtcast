@@ -7,11 +7,7 @@
         <p>{{canal.description}}</p>
       </ion-item>
     </ion-list>
-    <!--ion-fab right bottom>
-      <button ion-fab><ion-icon name="add"></ion-icon></button>
-    </ion-fab-->
-
-  
+  <ion-infinite-scroll ng-if="!desactivar" on-infinite="cargarCanales()" distance="10%"></ion-infinite-scroll>
   </ion-content>
 
 </ion-view>

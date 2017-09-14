@@ -9,12 +9,12 @@
       <img src="{{evento.image}}" style="display: block; width: 100%; height: auto; margin-left: auto; margin-right: auto;">
     </div>
     <div class="list">
-       <ion-item class="item-icon-left"><i class="icon ion-location"></i>{{evento.place}}</ion-item>
-       <ion-item class="item-icon-left">
+      <ion-item class="item-icon-left"><i class="icon ion-location"></i>{{evento.place}}</ion-item>
+      <ion-item class="item-icon-left">
         <i class="icon ion-calendar"></i>
         <span>{{evento.start_time | amDateFormat:'D MMMM YYYY, HH:mm'}}</span>
         <span ng-if="evento.end_time!=null"> - {{evento.end_time | amDateFormat:'D MMMM YYYY, HH:mm'}}</span>
-        </ion-item>
+      </ion-item>
     </div>
     <div class="show-list-numbers-and-dots">
       <p style="color:#000000;">
@@ -38,11 +38,12 @@
           Enviar
         </button>
       </div>
-      <ion-item class="item-avatar" ng-repeat="com in evento.comments | orderBy: 'created_time'">
+      <ion-item class="item-avatar item-icon-right" ng-repeat="com in evento.comments | orderBy: '-created_time'">
         <img src="{{com.author_data.image}}">
         <h2 ui-sref="perfil({id: com.author_data.id})">{{com.author_data.username}} 
         <small style="font-size: 80%; color: #BDBCBC;" am-time-ago="com.created_time"></small></h2>
         <p style="white-space:normal;">{{com.content}}</p>
+        <i class = "icon ion-android-alert" style="color: #D4D4D4; font-size: x-large;" ng-if="com.author_id!=myData.id" ui-sref="reportar({tipo: 'comentario', id: com.id})"></i>
       </ion-item>
     </ion-list>
   </ion-content>
